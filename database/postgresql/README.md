@@ -1,72 +1,88 @@
 # PostgreSQL
 
--- Information
+##### Information
+
+```sql
 SELECT * FROM public.f_database_info();
+```
 
--- Tilt
+##### Tilt
+
+```sql
 SELECT CASE WHEN '1,2,3,4,5,6,7' !~ '1' THEN 1 ELSE 0 END AS contain;
+```
 
--- Quarter
+##### Quarter
+
+```sql
 SELECT TO_CHAR(NOW(), 'Q');
+```
 
--- Week Number of Year
-SELECT TO_CHAR(NOW(), 'WW');
+##### Week Number of Year
 
--- Day of Year
+```sql
+SELECT TO_CHAR(NOW(), 'IW');
+```
+
+> ISO 8601, 01–53(the first Thursday of the year is in week 1)
+
+##### Day of Year
+
+```sql
 SELECT TO_CHAR(NOW(), 'DDD');
+```
 
--- Day of Week
-SELECT TO_CHAR(NOW(), 'D'), CASE WHEN '6,7' !~ TO_CHAR(NOW(), 'D') THEN 0 ELSE 1 END AS regex;
-SELECT TO_CHAR(NOW(), 'Dy');
-SELECT TO_CHAR(NOW(), 'IW');--week number of ISO 8601 week-numbering year (01–53; the first Thursday of the year is in week 1)
+##### Day of Week
+
+```sql
 SELECT TO_CHAR(NOW(), 'ID'), CASE WHEN TO_CHAR(NOW(), 'ID') = '7' THEN '1' ELSE '' END AS col01;--ISO 8601 day of the week, Monday (1) to Sunday (7)
+```
 
--- Date
-SELECT TO_CHAR(NOW(), 'YYYYMMDD'), TO_CHAR(NOW(), '000000'), TO_CHAR(NOW(), 'HH240000'), TO_TIMESTAMP(TO_CHAR(NOW(), 'YYYYMMDD'), 'YYYYMMDD'), TO_CHAR(NOW(), 'YYYY-MM-DD')::TIMESTAMP;
-SELECT TO_TIMESTAMP('20210101', 'YYYYMMDD'), TO_CHAR(TO_TIMESTAMP('20210101', 'YYYYMMDD'), 'YYYY-MM-DD HH24:MI:SS.MS');
-SELECT TO_CHAR(NOW(), 'YYYY-MM-DD HH24:MI:SS.MS'), TO_CHAR(NOW(), 'YYYY-MM-DD HH24:i:SS.MS'), TO_CHAR(NOW(), 'YYYYMMDDHH24MISSMS');
-SELECT TO_CHAR(NOW(), 'YYYY-MM-DD HH24:MI:SS.MS00'), NOW() AS now, NOW() AS date;
-SELECT TO_TIMESTAMP(1677749819421 / 1000);
-SELECT TO_CHAR(NOW() - '1 month'::INTERVAL + '1 day'::INTERVAL, 'YYYYMMDD');
-SELECT TO_CHAR('2023-06-16'::TIMESTAMP - '1 month'::INTERVAL, 'YYYYMMDD');
+> ISO 8601, Monday (1) to Sunday (7)
 
+##### Date
 
--- Date Add
-SELECT NOW() - INTERVAL '1 hour', NOW() - INTERVAL '1 month', TO_TIMESTAMP('20220131141210', 'YYYYMMDDHH24MISSMS') + INTERVAL '1 month';
-SELECT NOW() - INTERVAL '60 minute';
-SELECT NOW() - INTERVAL '10 minute', CASE WHEN NOW() < NOW() + INTERVAL '10 minute' THEN 1 ELSE 0 END AS is_diff;
-SELECT TO_CHAR(NOW() - INTERVAL '50 minute', 'YYYYMMDDHH24MI');
+```sql
+SELECT TO_CHAR(NOW(), 'YYYY-MM-DD HH24:MI:SS.MS'), '2023-06-16'::TIMESTAMP;
+```
 
-SELECT NOW() - INTERVAL '1 month';
-SELECT NOW() - INTERVAL '1 month' + INTERVAL '1 week';
-SELECT NOW() - INTERVAL '1 month' + INTERVAL '1 month';
-SELECT NOW() - INTERVAL '1 month' + INTERVAL '1 day';
+##### Date Add
 
+```sql
+SELECT NOW() - '1 hour'::INTERVAL;
+```
 
+##### Date Diff
 
--- Date Diff
-SELECT
-NOW()
-, TO_TIMESTAMP('2021-12-10 16:43', 'YYYY-MM-DD HH24:MI')
-, NOW() - TO_TIMESTAMP('2021-12-10 16:43', 'YYYY-MM-DD HH24:MI')
-, EXTRACT(EPOCH FROM (NOW() - TO_TIMESTAMP('202112101643', 'YYYYMMDDHH24MI')))
-;
+```sql
+SELECT EXTRACT(EPOCH FROM (NOW() - TO_TIMESTAMP('202112101643', 'YYYYMMDDHH24MI')));
+```
 
--- Powser
+##### Power
+
+```sql
 SELECT POWER(36, 8);
+```
 
--- Regex
-SELECT REGEXP_REPLACE('010-5654-5179', '[^0-9]', '', 'g');
-SELECT CONCAT('{', REGEXP_REPLACE(' 앞에 한칸 뒤에 두칸  ', '^\s+|\s+$', '', 'g'), '}');
-SELECT REGEXP_REPLACE('12341234123456', '(\d{4})(\d{4})(\d+)', '\1-\2-\3'), LENGTH('12341234123456');
-SELECT REGEXP_REPLACE('1144012200104260015', '(\d{10})(\d{1})(\d+)', '\1-\2-\3');
+##### Regex
 
--- Pad
+```sql
+SELECT REGEXP_REPLACE('010-1234-1234', '[^0-9]', '', 'g') AS only_number;
+SELECT REGEXP_REPLACE(' 앞에 한칸 뒤에 두칸  ', '^\s+|\s+$', '', 'g') AS trim_text;
+SELECT REGEXP_REPLACE('12341234123456', '(\d{4})(\d{4})(\d+)', '\1-\2-\3') AS format_text;
+```
+##### Pad
+
+```sql
 SELECT LPAD('123', 7, '0');
+```
 
--- GENERATE_SERIES
+##### GENERATE_SERIES
+
+```sql
 SELECT
 	t_items
 FROM
 	GENERATE_SERIES('2023-01-01'::TIMESTAMP, '2023-01-02'::TIMESTAMP, '1 hour') AS t_items
 ;
+```
