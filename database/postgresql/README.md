@@ -73,6 +73,7 @@ SELECT REGEXP_REPLACE('010-1234-1234', '[^0-9]', '', 'g') AS only_number;
 SELECT REGEXP_REPLACE(' 앞에 한칸 뒤에 두칸  ', '^\s+|\s+$', '', 'g') AS trim_text;
 SELECT REGEXP_REPLACE('12341234123456', '(\d{4})(\d{4})(\d+)', '\1-\2-\3') AS format_text;
 ```
+
 ##### Pad
 
 ```sql
