@@ -3,9 +3,9 @@
     "version": "2.2.11",
     "width": 2000,
     "height": 2000,
-    "scrollTop": -368.16666666666674,
-    "scrollLeft": -388,
-    "zoomLevel": 0.8,
+    "scrollTop": -193.50000000000045,
+    "scrollLeft": -133.99999999999994,
+    "zoomLevel": 0.9,
     "show": {
       "tableComment": true,
       "columnComment": true,
@@ -46,12 +46,12 @@
     "tables": [
       {
         "name": "restful.t_user_d0100",
-        "comment": "사용자 기본정보 목록",
+        "comment": "사용자기본정보",
         "columns": [
           {
             "name": "user_no",
             "comment": "사용자번호",
-            "dataType": "VARCHAR(10)",
+            "dataType": "VARCHAR(16)",
             "default": "",
             "option": {
               "autoIncrement": false,
@@ -306,21 +306,21 @@
           "active": false,
           "left": 686.5937,
           "top": 546.4445,
-          "zIndex": 4,
+          "zIndex": 69,
           "widthName": 120.5234375,
-          "widthComment": 120
+          "widthComment": 93
         },
         "visible": true,
         "id": "f574c6bf-3708-4111-846f-f8641692cb0c"
       },
       {
         "name": "restful.t_user_d0110",
-        "comment": "사용자 권한목록",
+        "comment": "사용자권한정보",
         "columns": [
           {
             "name": "user_no",
             "comment": "사용자번호 - t_user_d0100.user_no",
-            "dataType": "VARCHAR(10)",
+            "dataType": "VARCHAR(16)",
             "default": "",
             "option": {
               "autoIncrement": false,
@@ -344,7 +344,7 @@
             "name": "user_role",
             "comment": "사용자권한 - O: Owner, M: Manager, U: User",
             "dataType": "VARCHAR(1)",
-            "default": "'H'",
+            "default": "",
             "option": {
               "autoIncrement": false,
               "primaryKey": true,
@@ -412,7 +412,7 @@
           {
             "name": "user_no_updt",
             "comment": "수정사용자번호 - t_user_d0100.user_no",
-            "dataType": "VARCHAR(10)",
+            "dataType": "VARCHAR(16)",
             "default": "",
             "option": {
               "autoIncrement": false,
@@ -437,16 +437,16 @@
           "active": false,
           "left": 694.8824,
           "top": 965.7699,
-          "zIndex": 2,
+          "zIndex": 73,
           "widthName": 119.55859375,
-          "widthComment": 96.61181640625
+          "widthComment": 93
         },
         "visible": true,
         "id": "3e457284-63d3-4732-b871-dc93b9a25581"
       },
       {
         "name": "restful.t_user_d0120",
-        "comment": "사용자 계정목록",
+        "comment": "사용자계정정보",
         "columns": [
           {
             "name": "username",
@@ -520,7 +520,7 @@
           {
             "name": "user_no",
             "comment": "사용자번호",
-            "dataType": "VARCHAR(10)",
+            "dataType": "VARCHAR(16)",
             "default": "",
             "option": {
               "autoIncrement": false,
@@ -541,7 +541,7 @@
             "id": "c3c25c19-a382-4052-88f8-319c683a95d9"
           },
           {
-            "name": "secret",
+            "name": "password",
             "comment": "비밀번호",
             "dataType": "VARCHAR(64)",
             "default": "",
@@ -564,7 +564,7 @@
             "id": "a9d95f25-adb5-4ef6-a4fd-2399b0b0d6c1"
           },
           {
-            "name": "secret_expr",
+            "name": "password_expr",
             "comment": "비밀번호 만료일시",
             "dataType": "TIMESTAMP",
             "default": "",
@@ -579,7 +579,7 @@
               "pk": false,
               "fk": false,
               "pfk": false,
-              "widthName": 69.919921875,
+              "widthName": 90.15625,
               "widthComment": 109.61181640625,
               "widthDataType": 76.87060546875,
               "widthDefault": 60
@@ -611,7 +611,7 @@
           },
           {
             "name": "is_temp",
-            "comment": "임시비밀번호여부 - 0: 입력, 1: 임시",
+            "comment": "임시비밀번호구분 - 1: 임시",
             "dataType": "SMALLINT",
             "default": "1",
             "option": {
@@ -636,10 +636,10 @@
         "ui": {
           "active": false,
           "left": 700.7495,
-          "top": 166.25,
-          "zIndex": 5,
+          "top": 165.5093,
+          "zIndex": 71,
           "widthName": 120.5234375,
-          "widthComment": 96.61181640625
+          "widthComment": 93
         },
         "visible": true,
         "id": "8f359711-8519-4d32-a98c-36997f418b3f"
@@ -766,7 +766,7 @@
           {
             "name": "user_no",
             "comment": "사용자번호",
-            "dataType": "VARCHAR(10)",
+            "dataType": "VARCHAR(16)",
             "default": "",
             "option": {
               "autoIncrement": false,
@@ -915,7 +915,7 @@
       },
       {
         "name": "restful.t_user_d0200",
-        "comment": "조직 기본정보 목록",
+        "comment": "조직기본정보",
         "columns": [
           {
             "name": "org_no",
@@ -1083,21 +1083,21 @@
           "active": false,
           "left": 1292.2695,
           "top": 218,
-          "zIndex": 6,
+          "zIndex": 75,
           "widthName": 120.5234375,
-          "widthComment": 113.2236328125
+          "widthComment": 80
         },
         "visible": true,
         "id": "588f200d-6404-4152-ac55-44b04545e51d"
       },
       {
-        "name": "restful.t_user_d0140",
-        "comment": "조직 회원목록",
+        "name": "restful.t_user_d0209",
+        "comment": "조직사용자정보",
         "columns": [
           {
             "name": "user_no",
             "comment": "사용자번호",
-            "dataType": "VARCHAR(10)",
+            "dataType": "VARCHAR(16)",
             "default": "",
             "option": {
               "autoIncrement": false,
@@ -1142,71 +1142,9 @@
           },
           {
             "name": "date_inst",
-            "comment": "",
-            "dataType": "",
-            "default": "",
-            "option": {
-              "autoIncrement": false,
-              "primaryKey": false,
-              "unique": false,
-              "notNull": true
-            },
-            "ui": {
-              "active": false,
-              "pk": false,
-              "fk": false,
-              "pfk": false,
-              "widthName": 60,
-              "widthComment": 60,
-              "widthDataType": 60,
-              "widthDefault": 60
-            },
-            "id": "7c9930fc-5708-42a8-9892-824fabc5d03f"
-          },
-          {
-            "name": "date_updt",
-            "comment": "",
-            "dataType": "",
-            "default": "",
-            "option": {
-              "autoIncrement": false,
-              "primaryKey": false,
-              "unique": false,
-              "notNull": false
-            },
-            "ui": {
-              "active": false,
-              "pk": false,
-              "fk": false,
-              "pfk": false,
-              "widthName": 60,
-              "widthComment": 60,
-              "widthDataType": 60,
-              "widthDefault": 60
-            },
-            "id": "e9947ebf-8bcc-409e-a055-002e869f5254"
-          }
-        ],
-        "ui": {
-          "active": false,
-          "left": 1316.75,
-          "top": 543,
-          "zIndex": 1,
-          "widthName": 120.5234375,
-          "widthComment": 83.61181640625
-        },
-        "visible": true,
-        "id": "84e5e038-ea92-4987-850e-da72bb7f7e36"
-      },
-      {
-        "name": "restful.t_user_d0119",
-        "comment": "사용자 정보사용 이력",
-        "columns": [
-          {
-            "name": "date_updt",
-            "comment": "수정일시",
+            "comment": "등록일시",
             "dataType": "TIMESTAMP",
-            "default": "NOW()",
+            "default": "",
             "option": {
               "autoIncrement": false,
               "primaryKey": false,
@@ -1223,88 +1161,65 @@
               "widthDataType": 76.87060546875,
               "widthDefault": 60
             },
-            "id": "f2b34c20-817d-44ea-bb00-3799d2aa13f3"
+            "id": "7c9930fc-5708-42a8-9892-824fabc5d03f"
           },
           {
-            "name": "user_no",
-            "comment": "사용자번호 - t_user_d0100.user_no",
-            "dataType": "VARCHAR(10)",
+            "name": "date_updt",
+            "comment": "수정일시",
+            "dataType": "TIMESTAMP",
             "default": "",
             "option": {
               "autoIncrement": false,
               "primaryKey": false,
               "unique": false,
-              "notNull": true
+              "notNull": false
             },
             "ui": {
               "active": false,
               "pk": false,
-              "fk": true,
+              "fk": false,
               "pfk": false,
               "widthName": 60,
+              "widthComment": 60,
+              "widthDataType": 76.87060546875,
+              "widthDefault": 60
+            },
+            "id": "e9947ebf-8bcc-409e-a055-002e869f5254"
+          },
+          {
+            "name": "user_no_updt",
+            "comment": "수정사용자번호 - t_user_d0100.user_no",
+            "dataType": "VARCHAR(16)",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": false
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 81.5107421875,
               "widthComment": 120,
               "widthDataType": 87.71875,
               "widthDefault": 60
             },
-            "id": "4d22b3e0-977b-4c16-bf0f-307d4022619c"
-          },
-          {
-            "name": "event_name",
-            "comment": "이벤트이름 - 사용자추가, 사용자정보수정, 사용자권한추가 등 ",
-            "dataType": "VARCHAR(8)",
-            "default": "",
-            "option": {
-              "autoIncrement": false,
-              "primaryKey": false,
-              "unique": false,
-              "notNull": true
-            },
-            "ui": {
-              "active": false,
-              "pk": false,
-              "fk": false,
-              "pfk": false,
-              "widthName": 73.55078125,
-              "widthComment": 120,
-              "widthDataType": 80.48876953125,
-              "widthDefault": 60
-            },
-            "id": "c7494730-8c1e-48f4-b961-897485cf3753"
-          },
-          {
-            "name": "event_desc",
-            "comment": "이벤트내용",
-            "dataType": "VARCHAR(256)",
-            "default": "",
-            "option": {
-              "autoIncrement": false,
-              "primaryKey": false,
-              "unique": false,
-              "notNull": true
-            },
-            "ui": {
-              "active": false,
-              "pk": false,
-              "fk": false,
-              "pfk": false,
-              "widthName": 68.49169921875,
-              "widthComment": 67,
-              "widthDataType": 94.94873046875,
-              "widthDefault": 60
-            },
-            "id": "7c2f3c69-3ce1-4a70-85a0-466219be5752"
+            "id": "fe05eb13-f369-4555-b41f-b46537b2f554"
           }
         ],
         "ui": {
           "active": false,
-          "left": 1316.25,
-          "top": 706.1667,
-          "zIndex": 3,
-          "widthName": 119.55859375,
-          "widthComment": 120
+          "left": 1316.75,
+          "top": 543,
+          "zIndex": 77,
+          "widthName": 120.5234375,
+          "widthComment": 93
         },
         "visible": true,
-        "id": "8d49c1a4-ff85-4c9f-ab1a-a6d54e8bba24"
+        "id": "84e5e038-ea92-4987-850e-da72bb7f7e36"
       }
     ],
     "indexes": [
@@ -1345,18 +1260,14 @@
         "startRelationshipType": "Dash",
         "start": {
           "tableId": "f574c6bf-3708-4111-846f-f8641692cb0c",
-          "columnIds": [
-            "a24b570d-4a0c-4471-8fbb-16490e572418"
-          ],
+          "columnIds": ["a24b570d-4a0c-4471-8fbb-16490e572418"],
           "x": 922.297069140625,
           "y": 840.9445,
           "direction": "bottom"
         },
         "end": {
           "tableId": "3e457284-63d3-4732-b871-dc93b9a25581",
-          "columnIds": [
-            "91cee958-397c-4a36-af85-1f5802acc5f3"
-          ],
+          "columnIds": ["91cee958-397c-4a36-af85-1f5802acc5f3"],
           "x": 922.99714609375,
           "y": 965.7699,
           "direction": "top"
@@ -1371,20 +1282,16 @@
         "startRelationshipType": "Dash",
         "start": {
           "tableId": "f574c6bf-3708-4111-846f-f8641692cb0c",
-          "columnIds": [
-            "a24b570d-4a0c-4471-8fbb-16490e572418"
-          ],
+          "columnIds": ["a24b570d-4a0c-4471-8fbb-16490e572418"],
           "x": 922.297069140625,
           "y": 546.4445,
           "direction": "top"
         },
         "end": {
           "tableId": "8f359711-8519-4d32-a98c-36997f418b3f",
-          "columnIds": [
-            "c3c25c19-a382-4052-88f8-319c683a95d9"
-          ],
-          "x": 923.0688359375,
-          "y": 399.25,
+          "columnIds": ["c3c25c19-a382-4052-88f8-319c683a95d9"],
+          "x": 933.187,
+          "y": 398.5093,
           "direction": "bottom"
         },
         "constraintName": "fk_restful.t_user_d0100_to_restful.t_user_d0102",
@@ -1397,18 +1304,14 @@
         "startRelationshipType": "Dash",
         "start": {
           "tableId": "f574c6bf-3708-4111-846f-f8641692cb0c",
-          "columnIds": [
-            "a24b570d-4a0c-4471-8fbb-16490e572418"
-          ],
+          "columnIds": ["a24b570d-4a0c-4471-8fbb-16490e572418"],
           "x": 686.5937,
           "y": 693.6945,
           "direction": "left"
         },
         "end": {
           "tableId": "f2e06e5b-4484-4edb-8e76-a3e34559d45e",
-          "columnIds": [
-            "7c550772-c513-4b52-bc10-9bcf15b03a97"
-          ],
+          "columnIds": ["7c550772-c513-4b52-bc10-9bcf15b03a97"],
           "x": 471.6112671875,
           "y": 694.1119,
           "direction": "right"
@@ -1423,19 +1326,15 @@
         "startRelationshipType": "Dash",
         "start": {
           "tableId": "588f200d-6404-4152-ac55-44b04545e51d",
-          "columnIds": [
-            "bceb6c58-e5fd-4447-8306-b00f43e19cbc"
-          ],
+          "columnIds": ["bceb6c58-e5fd-4447-8306-b00f43e19cbc"],
           "x": 1506.759734375,
           "y": 430.5,
           "direction": "bottom"
         },
         "end": {
           "tableId": "84e5e038-ea92-4987-850e-da72bb7f7e36",
-          "columnIds": [
-            "5c82566c-7b03-4cac-8c58-23c6eafc081e"
-          ],
-          "x": 1507.609375,
+          "columnIds": ["5c82566c-7b03-4cac-8c58-23c6eafc081e"],
+          "x": 1544.86474609375,
           "y": 543,
           "direction": "top"
         },
@@ -1449,51 +1348,21 @@
         "startRelationshipType": "Dash",
         "start": {
           "tableId": "f574c6bf-3708-4111-846f-f8641692cb0c",
-          "columnIds": [
-            "a24b570d-4a0c-4471-8fbb-16490e572418"
-          ],
+          "columnIds": ["a24b570d-4a0c-4471-8fbb-16490e572418"],
           "x": 1158.00043828125,
           "y": 620.0695,
           "direction": "right"
         },
         "end": {
           "tableId": "84e5e038-ea92-4987-850e-da72bb7f7e36",
-          "columnIds": [
-            "77916a17-7a46-4eed-9d9f-7424063cca78"
-          ],
+          "columnIds": ["77916a17-7a46-4eed-9d9f-7424063cca78"],
           "x": 1316.75,
-          "y": 618.5,
+          "y": 628.75,
           "direction": "left"
         },
         "constraintName": "fk_restful.t_user_d0100_to_restful.t_user_d0120",
         "visible": true,
         "id": "e1407fc6-b3cd-4a53-84e9-6439b296566d"
-      },
-      {
-        "identification": false,
-        "relationshipType": "ZeroN",
-        "startRelationshipType": "Dash",
-        "start": {
-          "tableId": "f574c6bf-3708-4111-846f-f8641692cb0c",
-          "columnIds": [
-            "a24b570d-4a0c-4471-8fbb-16490e572418"
-          ],
-          "x": 1158.00043828125,
-          "y": 767.3195,
-          "direction": "right"
-        },
-        "end": {
-          "tableId": "8d49c1a4-ff85-4c9f-ab1a-a6d54e8bba24",
-          "columnIds": [
-            "4d22b3e0-977b-4c16-bf0f-307d4022619c"
-          ],
-          "x": 1316.25,
-          "y": 781.6667,
-          "direction": "left"
-        },
-        "constraintName": "fk_restful.t_user_d0100_to_restful.t_user_d0119",
-        "visible": true,
-        "id": "2f8839f0-dff1-42bc-818f-275317695a5c"
       }
     ]
   }
