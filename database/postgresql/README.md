@@ -1,6 +1,6 @@
 # PostgreSQL
 
-Data Type Formatting Functions [바로가기](https://www.postgresql.org/docs/8.4/functions-formatting.html)
+### Usage
 
 ##### Information
 
@@ -89,3 +89,7 @@ FROM
 	GENERATE_SERIES('2023-01-01'::TIMESTAMP, '2023-01-02'::TIMESTAMP, '1 hour') AS t_items
 ;
 ```
+
+### References
+
+[Data Type Formatting Functions](https://www.postgresql.org/docs/8.4/functions-formatting.html)

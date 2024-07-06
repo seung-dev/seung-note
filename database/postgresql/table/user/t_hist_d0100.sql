@@ -2,7 +2,7 @@
 --DROP TABLE IF EXISTS restful.t_hist_d0100 CASCADE;
 CREATE TABLE restful.t_hist_d0100
 (
-  date_updt     TIMESTAMP    NOT NULL DEFAULT NOW(),
+  updated_at     TIMESTAMP    NOT NULL DEFAULT NOW(),
   trace_id      VARCHAR(18)  NOT NULL,
   request_time  TIMESTAMP    NOT NULL,
   response_time TIMESTAMP    NOT NULL,
@@ -20,13 +20,13 @@ CREATE TABLE restful.t_hist_d0100
   user_no       VARCHAR(32) ,
   user_roles    VARCHAR(32) ,
   error_code    VARCHAR(8)  ,
-  CONSTRAINT pk_t_hist_d0100 PRIMARY KEY (date_updt, trace_id)
-) PARTITION BY RANGE(date_updt);
+  CONSTRAINT pk_t_hist_d0100 PRIMARY KEY (updated_at, trace_id)
+) PARTITION BY RANGE(updated_at);
 
 
 COMMENT ON TABLE restful.t_hist_d0100 IS 'REST 요청내역';
 
-COMMENT ON COLUMN restful.t_hist_d0100.date_updt IS '수정일시';
+COMMENT ON COLUMN restful.t_hist_d0100.updated_at IS '수정일시';
 COMMENT ON COLUMN restful.t_hist_d0100.trace_id IS 'Trace ID';
 COMMENT ON COLUMN restful.t_hist_d0100.request_time IS 'Request Time';
 COMMENT ON COLUMN restful.t_hist_d0100.response_time IS 'Response Time';

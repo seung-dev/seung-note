@@ -1,14 +1,14 @@
 --DROP TABLE IF EXISTS public.t_partition_range;
 CREATE TABLE public.t_partition_range (
-	date_updt TIMESTAMP NOT NULL DEFAULT NOW()
+	updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 	, contents VARCHAR(4) DEFAULT ''
-	, CONSTRAINT pk_t_partition_range PRIMARY KEY (date_updt)
-) PARTITION BY RANGE(date_updt);
+	, CONSTRAINT pk_t_partition_range PRIMARY KEY (updated_at)
+) PARTITION BY RANGE(updated_at);
 
 
 COMMENT ON TABLE public.t_partition_range IS '파티션 범위 테이블';
 
-COMMENT ON COLUMN public.t_partition_range.date_updt  IS '수정일시';
+COMMENT ON COLUMN public.t_partition_range.updated_at  IS '수정일시';
 COMMENT ON COLUMN public.t_partition_range.contents   IS '내용';
 
 
@@ -25,7 +25,7 @@ SELECT * FROM realinfo.t_rest_hist_202309 ORDER BY 1 DESC;
 EXPLAIN ANALYZE
 SELECT * FROM realinfo.t_rest_hist
 WHERE
-	date_updt > '2023-09-01'
+	updated_at > '2023-09-01'
 ORDER BY
 1 DESC
 ;

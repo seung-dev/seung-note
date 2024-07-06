@@ -1,28 +1,26 @@
 # seung-note
-Note Anything
 
-##### Weekly Report
+### Container
 
-<table>
-	<thead>
-		<tr>
-			<th colspan="5">금주 ( MM.dd ~ MM.dd )</th>
-			<th colspan="5">전주 ( MM.dd ~ MM.dd )</th>
-			<th rowspan="2">비고</th>
-		</tr>
-		<tr>
-			<th>업무</th>
-			<th>상태</th>
-			<th>담당자</th>
-			<th>예정일</th>
-			<th>완료일</th>
-			<th>업무</th>
-			<th>상태</th>
-			<th>담당자</th>
-			<th>예정일</th>
-			<th>완료일</th>
-		</tr>
-	</thead>
-</table>
+- [docker](https://github.com/seung-dev/seung-note/tree/main/docker)
+- [kubernetes](https://github.com/seung-dev/seung-note/tree/main/kubernetes)
+- [sdocker](https://github.com/seung-dev/seung-note/tree/main/sdocker)
+- [registry](https://github.com/seung-dev/seung-note/tree/main/registry)
+- [roket.chat](https://github.com/seung-dev/seung-note/tree/main/roket.chat)
 
-Sourcetree Test
+### Database
+
+- [database](https://github.com/seung-dev/seung-note/tree/main/database)
+  - [postgresql](https://github.com/seung-dev/seung-note/tree/main/database)
+
+### Java
+
+- [java](https://github.com/seung-dev/seung-note/tree/main/java)
+- [gradle](https://github.com/seung-dev/seung-note/tree/main/gradle)
+
+### MISC
+
+- [misc](https://github.com/seung-dev/seung-note/tree/main/misc)
+  - Useful Online Services
+  - Regex
+  - Self Signed Certificate

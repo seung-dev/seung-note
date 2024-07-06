@@ -2,8 +2,8 @@
 CREATE TABLE restful.t_user_d0100
 (
   user_no      VARCHAR(16) NOT NULL,
-  date_inst    TIMESTAMP   NOT NULL DEFAULT NOW(),
-  date_updt    TIMESTAMP   NOT NULL DEFAULT NOW(),
+  created_at    TIMESTAMP   NOT NULL DEFAULT NOW(),
+  updated_at    TIMESTAMP   NOT NULL DEFAULT NOW(),
   user_state   VARCHAR(1)  NOT NULL DEFAULT 'H',
   date_signin  TIMESTAMP  ,
   date_close   TIMESTAMP  ,
@@ -19,8 +19,8 @@ CREATE TABLE restful.t_user_d0100
 COMMENT ON TABLE restful.t_user_d0100 IS '사용자 기본정보';
 
 COMMENT ON COLUMN restful.t_user_d0100.user_no IS '사용자번호';
-COMMENT ON COLUMN restful.t_user_d0100.date_inst IS '등록일시';
-COMMENT ON COLUMN restful.t_user_d0100.date_updt IS '수정일시';
+COMMENT ON COLUMN restful.t_user_d0100.created_at IS '등록일시';
+COMMENT ON COLUMN restful.t_user_d0100.updated_at IS '수정일시';
 COMMENT ON COLUMN restful.t_user_d0100.user_state IS '사용자상태 - Active:  사용, Disabled: 잠김, Closed: 탈퇴, Holding: 사용대기';
 COMMENT ON COLUMN restful.t_user_d0100.date_signin IS '로그인일시';
 COMMENT ON COLUMN restful.t_user_d0100.date_close IS '탈퇴일시';

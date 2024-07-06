@@ -2,8 +2,8 @@
 CREATE TABLE restful.t_user_d0200
 (
   org_no      VARCHAR(16) NOT NULL,
-  date_inst   TIMESTAMP   NOT NULL DEFAULT NOW(),
-  date_updt   TIMESTAMP   NOT NULL DEFAULT NOW(),
+  created_at   TIMESTAMP   NOT NULL DEFAULT NOW(),
+  updated_at   TIMESTAMP   NOT NULL DEFAULT NOW(),
   org_domain  VARCHAR(16) NOT NULL,
   is_active   SMALLINT    NOT NULL DEFAULT 1,
   org_no_prev VARCHAR(16) NOT NULL,
@@ -21,8 +21,8 @@ CREATE INDEX idx_0_t_user_d0200 ON restful.t_user_d0200 (is_active);
 COMMENT ON TABLE restful.t_user_d0200 IS '조직 기본정보';
 
 COMMENT ON COLUMN restful.t_user_d0200.org_no IS '조직번호';
-COMMENT ON COLUMN restful.t_user_d0200.date_inst IS '등록일시';
-COMMENT ON COLUMN restful.t_user_d0200.date_updt IS '수정일시';
+COMMENT ON COLUMN restful.t_user_d0200.created_at IS '등록일시';
+COMMENT ON COLUMN restful.t_user_d0200.updated_at IS '수정일시';
 COMMENT ON COLUMN restful.t_user_d0200.org_domain IS '조직도메인';
 COMMENT ON COLUMN restful.t_user_d0200.is_active IS '사용구분 - 0: 미사용, 1: 사용';
 COMMENT ON COLUMN restful.t_user_d0200.org_no_prev IS '상위조직번호';
