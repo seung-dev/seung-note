@@ -45,7 +45,7 @@ docker compose -f docker-compose.yaml up -d
 ```
 
 > [!NOTE]
-> Generate Self Signed Certificate(https://hub.docker.com/_/registry) for TLS
+> [Generate Self Signed Certificate](https://github.com/seung-dev/seung-note/tree/main/misc#generate-self-signed-certificate) for TLS
 
 ### References
 
