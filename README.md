@@ -5,7 +5,7 @@
   - [Kubernetes](https://github.com/seung-dev/seung-note/tree/main/kubernetes)
   - [sdocker](https://github.com/seung-dev/seung-note/tree/main/sdocker)
   - [registry](https://github.com/seung-dev/seung-note/tree/main/registry)
-  - [roket.chat](https://github.com/seung-dev/seung-note/tree/main/roketchat)
+  - [roket.chat](https://github.com/seung-dev/seung-note/tree/main/rocketchat)
 - [Database](https://github.com/seung-dev/seung-note/tree/main/database)
   - [postgresql](https://github.com/seung-dev/seung-note/tree/main/database)
 - [Java](https://github.com/seung-dev/seung-note/tree/main/java)
