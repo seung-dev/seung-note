@@ -1,4 +1,4 @@
-# Miscellaneous
+# Misc
 
 ### Useful Online Services
 
@@ -58,3 +58,19 @@ certutil -addstore Root %UserProfile%\.ssl\127.0.0.1.crt
 
 > [!NOTE]
 > Use [Administrator: Command Prompt]
+
+### Windows
+
+##### Add System Path
+
+```cmd
+cd %UserProfile%
+```
+
+```cmd
+mkdir .seung
+```
+
+```cmd
+setx SEUNG_PATH %UserProfile%\.seung
+```

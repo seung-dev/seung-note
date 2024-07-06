@@ -23,7 +23,10 @@ curl -k https://127.0.0.1:18579/v2/[name]/manifests/[version]
 ##### digest
 
 ```cmd
-curl -k -sS -o nul -w "%header{Docker-Content-Digest}" -H "Accept: application/vnd.docker.distribution.manifest.v2+json" https://127.0.0.1:18579/v2/[name]/manifests/[version]
+curl -k -sS -o nul
+  -w "%header{Docker-Content-Digest}"
+  -H "Accept: application/vnd.docker.distribution.manifest.v2+json"
+  https://127.0.0.1:18579/v2/[name]/manifests/[version]
 ```
 
 ##### delete
@@ -35,10 +38,12 @@ curl -k -X DELETE https://127.0.0.1:18579/v2/[name]/manifests/[digest]
 ##### vacuum
 
 ```cmd
-for /f %a in ('docker container -aqf "name=registry"') do (docker container exec -it %a registry garbage-collect -m /etc/docker/registry/config.yml)
+for /f %a in ('docker container ls -aqf "name=registry"') do (
+  docker container exec -it %a registry garbage-collect -m /etc/docker/registry/config.yml
+)
 ```
 
-### Run
+### Deploy with Docker & Docker Compose
 
 ```cmd
 docker compose -f docker-compose.yaml up -d

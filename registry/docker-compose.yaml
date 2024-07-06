@@ -8,8 +8,8 @@ services:
     image: registry:2.8.3
     volumes:
       - registry:/var/lib/registry
-      - /C/Users/seung/.ssl/127.0.0.1.crt:/root/.ssl/127.0.0.1.crt
-      - /C/Users/seung/.ssl/127.0.0.1.key:/root/.ssl/127.0.0.1.key
+      - ${UserProfile}/.ssl/127.0.0.1.crt:/root/.ssl/127.0.0.1.crt
+      - ${UserProfile}/.ssl/127.0.0.1.key:/root/.ssl/127.0.0.1.key
     environment:
       REGISTRY_STORAGE_DELETE_ENABLED: true
       REGISTRY_HTTP_TLS_CERTIFICATE: /root/.ssl/127.0.0.1.crt
