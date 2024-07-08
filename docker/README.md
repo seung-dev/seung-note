@@ -2,19 +2,19 @@
 
 ### Usage
 
-##### Version
+##### Show Version
 
 ```cmd
 docker --version
 ```
 
-##### Information
+##### Show Information
 
 ```cmd
-docker info
+docker system info
 ```
 
-##### Images
+##### List Images
 
 ```cmd
 docker image ls -a --no-trunc
@@ -28,7 +28,13 @@ docker image ls -aq
 docker image ls -aqf "dangling=true"
 ```
 
-##### Containers
+##### Delete Unused Images
+
+```cmd
+docker image prune -f
+```
+
+##### List Containers
 
 ```cmd
 docker container ls -a --no-trunc
@@ -40,6 +46,30 @@ docker container ls -aq
 
 ```cmd
 docker container ls -af "exited=0"
+```
+
+##### List Windows Credentials
+
+```cmd
+"C:\Program Files\Docker\Docker\resources\bin\docker-credential-wincred.exe" list
+```
+
+##### Add Windows Credentials
+
+```cmd
+echo {"ServerURL":"[Registry Endpoint]","Username":"[Username]","Secret":"[Secret]"} | "C:\Program Files\Docker\Docker\resources\bin\docker-credential-wincred.exe" store
+```
+
+##### Show Windows Credential
+
+```cmd
+echo [Registry Endpoint] | "C:\Program Files\Docker\Docker\resources\bin\docker-credential-wincred.exe" get
+```
+
+##### Remove Windows Credential
+
+```cmd
+echo [Registry Endpoint] | "C:\Program Files\Docker\Docker\resources\bin\docker-credential-wincred.exe" erase
 ```
 
 ### Rerferences

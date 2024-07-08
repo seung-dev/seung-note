@@ -2,25 +2,25 @@
 
 ### Usage
 
-##### catalog
+##### Request catalog
 
 ```cmd
 curl -k https://127.0.0.1:18579/v2/_catalog
 ```
 
-##### tags
+##### Request tags
 
 ```cmd
 curl -k https://127.0.0.1:18579/v2/[name]/tags/list
 ```
 
-##### manifests
+##### Request manifests
 
 ```cmd
 curl -k https://127.0.0.1:18579/v2/[name]/manifests/[version]
 ```
 
-##### digest
+##### Request digest
 
 ```cmd
 curl -k -sS -o nul
@@ -29,13 +29,13 @@ curl -k -sS -o nul
   https://127.0.0.1:18579/v2/[name]/manifests/[version]
 ```
 
-##### delete
+##### Request delete
 
 ```cmd
 curl -k -X DELETE https://127.0.0.1:18579/v2/[name]/manifests/[digest]
 ```
 
-##### vacuum
+##### Run vacuum
 
 ```cmd
 for /f %a in ('docker container ls -aqf "name=registry"') do (

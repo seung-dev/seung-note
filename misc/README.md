@@ -64,13 +64,16 @@ certutil -addstore Root %UserProfile%\.ssl\127.0.0.1.crt
 ##### Add System Path
 
 ```cmd
-cd %UserProfile%
-```
-
-```cmd
-mkdir .seung
+mkdir %UserProfile%\.seung\bin
 ```
 
 ```cmd
 setx SEUNG_PATH %UserProfile%\.seung
 ```
+
+```cmd
+setx PATH "%PATH%;%SEUNG_PATH%\bin"
+```
+
+> [!NOTE]
+> Use [Administrator: Command Prompt]

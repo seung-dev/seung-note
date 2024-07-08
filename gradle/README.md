@@ -2,7 +2,7 @@
 
 ### Usage
 
-##### Check Version
+##### Show Version
 
 ```
 gradle -v
@@ -20,7 +20,7 @@ gradle wrapper
 gradlew wrapper --gradle-version 8.3
 ```
 
-##### Build
+##### Build Application
 
 ```
 gradlew clean build --refresh-dependencies -P{key}={value}
