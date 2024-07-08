@@ -77,7 +77,7 @@ if "%~1"=="" (
     )
     if "-ap"=="!ARG1!" (
         if not "-"=="!ARG2:~0,1!" (
-            set "APP_PATH=!ARG2!"
+            set "WORK_DIR=!ARG2!"
             shift
         )
         shift
@@ -85,7 +85,7 @@ if "%~1"=="" (
     )
     if "-dc"=="!ARG1!" (
         if not "-"=="!ARG2:~0,1!" (
-            set "DOCKER_COMPOSE=!ARG2!"
+            set "DOCKER_COMPOSE_FILE=!ARG2!"
             shift
         )
         shift
@@ -93,7 +93,7 @@ if "%~1"=="" (
     )
     if "-do"=="!ARG1!" (
         if not "-"=="!ARG2:~0,1!" (
-            set "ORIGIN_REGISTRY=!ARG2!"
+            set "ORIGIN_REGISTRY_ENDPOINT=!ARG2!"
             shift
         )
         shift
@@ -101,7 +101,7 @@ if "%~1"=="" (
     )
     if "-dt"=="!ARG1!" (
         if not "-"=="!ARG2:~0,1!" (
-            set "TARGET_REGISTRY=!ARG2!"
+            set "TARGET_REGISTRY_ENDPOINT=!ARG2!"
             shift
         )
         shift
@@ -109,7 +109,7 @@ if "%~1"=="" (
     )
     if "-np"=="!ARG1!" (
         if not "-"=="!ARG2:~0,1!" (
-            set "NCR_PUBLIC=!ARG2!"
+            set "NCR_PUBLIC_ENDPOINT=!ARG2!"
             shift
         )
         shift
@@ -117,7 +117,7 @@ if "%~1"=="" (
     )
     if "-ns"=="!ARG1!" (
         if not "-"=="!ARG2:~0,1!" (
-            set "NCR_PRIVATE=!ARG2!"
+            set "NCR_PRIVATE_ENDPOINT=!ARG2!"
             shift
         )
         shift
@@ -133,7 +133,7 @@ if "%~1"=="" (
     )
     if "-kp"=="!ARG1!" (
         if not "-"=="!ARG2:~0,1!" (
-            set "CLUSTER_PATH=!ARG2!"
+            set "WORK_DIR=!ARG2!"
             shift
         )
         shift
@@ -141,7 +141,7 @@ if "%~1"=="" (
     )
     if "-kc"=="!ARG1!" (
         if not "-"=="!ARG2:~0,1!" (
-            set "KUBE_CONFIG=!ARG2!"
+            set "KUBE_CONFIG_FILE=!ARG2!"
             shift
         )
         shift
@@ -149,7 +149,7 @@ if "%~1"=="" (
     )
     if "-ka"=="!ARG1!" (
         if not "-"=="!ARG2:~0,1!" (
-            set "KUBE_APPLY=!ARG2!"
+            set "KUBE_APPLY_FILE=!ARG2!"
             shift
         )
         shift
@@ -277,45 +277,45 @@ if "%~1"=="" (
     @rem Path
     :input_app_path
         if not "1"=="!OPTION_B!" if not "1"=="!OPTION_D!" if not "1"=="!OPTION_U!" goto input_registry
-        if not ""=="!APP_PATH!" (
-            echo - Path [%DEFAULT_ROOT%\!APP_NAME!]%COLON% !APP_PATH!
+        if not ""=="!WORK_DIR!" (
+            echo - Path [%DEFAULT_ROOT_DIR%\!APP_NAME!]%COLON% !WORK_DIR!
             goto move_app_path
         )
         if not "1"=="!OPTION_INPUT!" (
-            set "APP_PATH=%DEFAULT_ROOT%\!APP_NAME!"
-            echo - Path [%DEFAULT_ROOT%\!APP_NAME!]%COLON% !APP_PATH!
+            set "WORK_DIR=%DEFAULT_ROOT_DIR%\!APP_NAME!"
+            echo - Path [%DEFAULT_ROOT_DIR%\!APP_NAME!]%COLON% !WORK_DIR!
             goto move_app_path
         )
-        set /p APP_PATH="- Path [%DEFAULT_ROOT%\!APP_NAME!]%COLON% "
-        if ""=="!APP_PATH!" (
+        set /p WORK_DIR="- Path [%DEFAULT_ROOT_DIR%\!APP_NAME!]%COLON% "
+        if ""=="!WORK_DIR!" (
             set /p CONTINUE="Continue using the default value [y/n]%COLON% "
             if /i not "y"=="!CONTINUE!" goto end
-            set "APP_PATH=%DEFAULT_ROOT%\!APP_NAME!"
+            set "WORK_DIR=%DEFAULT_ROOT_DIR%\!APP_NAME!"
         )
     :move_app_path
-        cd /d "!APP_PATH!" >nul 2>&1
+        cd /d "!WORK_DIR!" >nul 2>&1
         if errorlevel 1 (
             echo.
-            echo sdocker%COLON% Failed to move to !APP_PATH!
+            echo sdocker%COLON% Failed to move to !WORK_DIR!
             goto fail
         )
     @rem Docker Compose
     :input_docker_compose
         if not "1"=="!OPTION_D!" if not "1"=="!OPTION_U!" goto input_registry
-        if not ""=="!DOCKER_COMPOSE!" (
-            echo - Compose File [%DEFAULT_DOCKER_COMPOSE%]%COLON% !DOCKER_COMPOSE!
+        if not ""=="!DOCKER_COMPOSE_FILE!" (
+            echo - Compose File [%DEFAULT_DOCKER_COMPOSE_FILE%]%COLON% !DOCKER_COMPOSE_FILE!
             goto input_registry
         )
         if not "1"=="!OPTION_INPUT!" (
-            set "DOCKER_COMPOSE=%DEFAULT_DOCKER_COMPOSE%"
-            echo - Compose File [%DEFAULT_DOCKER_COMPOSE%]%COLON% !DOCKER_COMPOSE!
+            set "DOCKER_COMPOSE_FILE=%DEFAULT_DOCKER_COMPOSE_FILE%"
+            echo - Compose File [%DEFAULT_DOCKER_COMPOSE_FILE%]%COLON% !DOCKER_COMPOSE_FILE!
             goto input_registry
         )
-        set /p DOCKER_COMPOSE="- Compose File [%DEFAULT_DOCKER_COMPOSE%]%COLON% "
-        if ""=="!DOCKER_COMPOSE!" (
+        set /p DOCKER_COMPOSE_FILE="- Compose File [%DEFAULT_DOCKER_COMPOSE_FILE%]%COLON% "
+        if ""=="!DOCKER_COMPOSE_FILE!" (
             set /p CONTINUE="Continue using the default value [y/n]%COLON% "
             if /i not "y"=="!CONTINUE!" goto end
-            set "DOCKER_COMPOSE=%DEFAULT_DOCKER_COMPOSE%"
+            set "DOCKER_COMPOSE_FILE=%DEFAULT_DOCKER_COMPOSE_FILE%"
         )
 
 @rem Registry
@@ -325,74 +325,74 @@ if "%~1"=="" (
     @rem Origin Registry
     :input_origin
         if not "1"=="!OPTION_L!" if not "1"=="!OPTION_S!" goto input_target
-        if not ""=="!ORIGIN_REGISTRY!" (
-            echo - Origin Registry Endpoint [%DEFAULT_ORIGIN_REGISTRY%]%COLON% !ORIGIN_REGISTRY!
+        if not ""=="!ORIGIN_REGISTRY_ENDPOINT!" (
+            echo - Origin Registry Endpoint [%DEFAULT_ORIGIN_REGISTRY_ENDPOINT%]%COLON% !ORIGIN_REGISTRY_ENDPOINT!
             goto input_target
         )
         if not "1"=="!OPTION_INPUT!" (
-            set "ORIGIN_REGISTRY=%DEFAULT_ORIGIN_REGISTRY%"
-            echo - Origin Registry Endpoint [%DEFAULT_ORIGIN_REGISTRY%]%COLON% !ORIGIN_REGISTRY!
+            set "ORIGIN_REGISTRY_ENDPOINT=%DEFAULT_ORIGIN_REGISTRY_ENDPOINT%"
+            echo - Origin Registry Endpoint [%DEFAULT_ORIGIN_REGISTRY_ENDPOINT%]%COLON% !ORIGIN_REGISTRY_ENDPOINT!
             goto input_target
         )
-        set /p ORIGIN_REGISTRY="- Origin Registry Endpoint [%DEFAULT_ORIGIN_REGISTRY%]%COLON% "
-        if ""=="!ORIGIN_REGISTRY!" (
+        set /p ORIGIN_REGISTRY_ENDPOINT="- Origin Registry Endpoint [%DEFAULT_ORIGIN_REGISTRY_ENDPOINT%]%COLON% "
+        if ""=="!ORIGIN_REGISTRY_ENDPOINT!" (
             set /p CONTINUE="Continue using the default value [y/n]%COLON% "
             if /i not "y"=="!CONTINUE!" goto end
-            set "ORIGIN_REGISTRY=%DEFAULT_ORIGIN_REGISTRY%"
+            set "ORIGIN_REGISTRY_ENDPOINT=%DEFAULT_ORIGIN_REGISTRY_ENDPOINT%"
         )
     @rem Target Registry
     :input_target
         if not "1"=="!OPTION_D!" if not "1"=="!OPTION_U!" if not "1"=="!OPTION_P!" goto input_ncr_public
-        if not ""=="!TARGET_REGISTRY!" (
-            echo - Target Registry Endpoint [%DEFAULT_TARGET_REGISTRY%]%COLON% !TARGET_REGISTRY!
+        if not ""=="!TARGET_REGISTRY_ENDPOINT!" (
+            echo - Target Registry Endpoint [%DEFAULT_TARGET_REGISTRY_ENDPOINT%]%COLON% !TARGET_REGISTRY_ENDPOINT!
             goto input_ncr_public
         )
         if not "1"=="!OPTION_INPUT!" (
-            set "TARGET_REGISTRY=%DEFAULT_TARGET_REGISTRY%"
-            echo - Target Registry Endpoint [%DEFAULT_TARGET_REGISTRY%]%COLON% !TARGET_REGISTRY!
+            set "TARGET_REGISTRY_ENDPOINT=%DEFAULT_TARGET_REGISTRY_ENDPOINT%"
+            echo - Target Registry Endpoint [%DEFAULT_TARGET_REGISTRY_ENDPOINT%]%COLON% !TARGET_REGISTRY_ENDPOINT!
             goto input_ncr_public
         )
-        set /p TARGET_REGISTRY="- Target Registry Endpoint [%DEFAULT_TARGET_REGISTRY%]%COLON% "
-        if ""=="!TARGET_REGISTRY!" (
+        set /p TARGET_REGISTRY_ENDPOINT="- Target Registry Endpoint [%DEFAULT_TARGET_REGISTRY_ENDPOINT%]%COLON% "
+        if ""=="!TARGET_REGISTRY_ENDPOINT!" (
             set /p CONTINUE="Continue using the default value [y/n]%COLON% "
             if /i not "y"=="!CONTINUE!" goto end
-            set "TARGET_REGISTRY=%DEFAULT_TARGET_REGISTRY%"
+            set "TARGET_REGISTRY_ENDPOINT=%DEFAULT_TARGET_REGISTRY_ENDPOINT%"
         )
     @rem NCR Public
     :input_ncr_public
         if not "1"=="!OPTION_S!" goto input_ncr_private
-        if not ""=="!NCR_PUBLIC!" (
-            echo - NCR Public Name [%DEFAULT_NCR_PUBLIC%]%COLON% !NCR_PUBLIC!
+        if not ""=="!NCR_PUBLIC_ENDPOINT!" (
+            echo - NCR Public Name [%DEFAULT_NCR_PUBLIC_ENDPOINT%]%COLON% !NCR_PUBLIC_ENDPOINT!
             goto input_ncr_private
         )
         if not "1"=="!OPTION_INPUT!" (
-            set "NCR_PUBLIC=%DEFAULT_NCR_PUBLIC%"
-            echo - NCR Public Name [%DEFAULT_NCR_PUBLIC%]%COLON% !NCR_PUBLIC!
+            set "NCR_PUBLIC_ENDPOINT=%DEFAULT_NCR_PUBLIC_ENDPOINT%"
+            echo - NCR Public Name [%DEFAULT_NCR_PUBLIC_ENDPOINT%]%COLON% !NCR_PUBLIC_ENDPOINT!
             goto input_ncr_private
         )
-        set /p NCR_PUBLIC="- NCR Public Name [%DEFAULT_NCR_PUBLIC%]%COLON% "
-        if ""=="!NCR_PUBLIC!" (
+        set /p NCR_PUBLIC_ENDPOINT="- NCR Public Name [%DEFAULT_NCR_PUBLIC_ENDPOINT%]%COLON% "
+        if ""=="!NCR_PUBLIC_ENDPOINT!" (
             set /p CONTINUE="Continue using the default value [y/n]%COLON% "
             if /i not "y"=="!CONTINUE!" goto end
-            set "NCR_PUBLIC=%DEFAULT_NCR_PUBLIC%"
+            set "NCR_PUBLIC_ENDPOINT=%DEFAULT_NCR_PUBLIC_ENDPOINT%"
         )
     @rem NCR Private
     :input_ncr_private
         if not "1"=="!OPTION_A!" goto input_kubernetes
-        if not ""=="!NCR_PRIVATE!" (
-            echo - NCR Private Name [%DEFAULT_NCR_PRIVATE%]%COLON% !NCR_PRIVATE!
+        if not ""=="!NCR_PRIVATE_ENDPOINT!" (
+            echo - NCR Private Name [%DEFAULT_NCR_PRIVATE_ENDPOINT%]%COLON% !NCR_PRIVATE_ENDPOINT!
             goto input_kubernetes
         )
         if not "1"=="!OPTION_INPUT!" (
-            set "NCR_PRIVATE=%DEFAULT_NCR_PRIVATE%"
-            echo - NCR Public Name [%DEFAULT_NCR_PRIVATE%]%COLON% !NCR_PRIVATE!
+            set "NCR_PRIVATE_ENDPOINT=%DEFAULT_NCR_PRIVATE_ENDPOINT%"
+            echo - NCR Public Name [%DEFAULT_NCR_PRIVATE_ENDPOINT%]%COLON% !NCR_PRIVATE_ENDPOINT!
             goto input_kubernetes
         )
-        set /p NCR_PRIVATE="- NCR Private Name []%COLON% "
-        if ""=="!NCR_PRIVATE!" (
+        set /p NCR_PRIVATE_ENDPOINT="- NCR Private Name []%COLON% "
+        if ""=="!NCR_PRIVATE_ENDPOINT!" (
             set /p CONTINUE="Continue using the default value [y/n]%COLON% "
             if /i not "y"=="!CONTINUE!" goto end
-            set "NCR_PRIVATE=%DEFAULT_NCR_PRIVATE%"
+            set "NCR_PRIVATE_ENDPOINT=%DEFAULT_NCR_PRIVATE_ENDPOINT%"
         )
 
 @rem Kubernetes
@@ -408,61 +408,61 @@ if "%~1"=="" (
         set /p CLUSTER_NAME="- Cluster Name []%COLON% "
         if ""=="!CLUSTER_NAME!" goto required
     :input_cluster_path
-        if not ""=="!CLUSTER_PATH!" (
-            echo - Cluster Path [%DEFAULT_ROOT%\!CLUSTER_NAME!]%COLON% !CLUSTER_PATH!
+        if not ""=="!WORK_DIR!" (
+            echo - Cluster Path [%DEFAULT_ROOT_DIR%\!CLUSTER_NAME!]%COLON% !WORK_DIR!
             goto move_cluster_path
         )
         if not "1"=="!OPTION_INPUT!" (
-            set "CLUSTER_PATH=%DEFAULT_ROOT%\!CLUSTER_NAME!"
-            echo - Cluster Path [%DEFAULT_ROOT%\!CLUSTER_NAME!]%COLON% !CLUSTER_PATH!
+            set "WORK_DIR=%DEFAULT_ROOT_DIR%\!CLUSTER_NAME!"
+            echo - Cluster Path [%DEFAULT_ROOT_DIR%\!CLUSTER_NAME!]%COLON% !WORK_DIR!
             goto move_cluster_path
         )
-        set /p CLUSTER_PATH="- Cluster Path [%DEFAULT_ROOT%\!CLUSTER_NAME!]%COLON% "
-        if ""=="!CLUSTER_PATH!" (
+        set /p WORK_DIR="- Cluster Path [%DEFAULT_ROOT_DIR%\!CLUSTER_NAME!]%COLON% "
+        if ""=="!WORK_DIR!" (
             set /p CONTINUE="Continue using the default value [y/n]%COLON% "
             if /i not "y"=="!CONTINUE!" goto end
-            set "CLUSTER_PATH=%DEFAULT_ROOT%\!CLUSTER_NAME!"
+            set "WORK_DIR=%DEFAULT_ROOT_DIR%\!CLUSTER_NAME!"
         )
     :move_cluster_path
-        cd /d "!CLUSTER_PATH!" >nul 2>&1
+        cd /d "!WORK_DIR!" >nul 2>&1
         if errorlevel 1 (
             echo.
-            echo sdocker%COLON% Failed to move to !CLUSTER_PATH!
+            echo sdocker%COLON% Failed to move to !WORK_DIR!
             goto fail
         )
     @rem Config
     :input_kube_config
-        if not ""=="!KUBE_CONFIG!" (
-            echo - Cluster Config File [%DEFAULT_KUBE_CONFIG%]%COLON% !KUBE_CONFIG!
+        if not ""=="!KUBE_CONFIG_FILE!" (
+            echo - Cluster Config File [%DEFAULT_KUBE_CONFIG_FILE%]%COLON% !KUBE_CONFIG_FILE!
             goto input_kube_apply
         )
         if not "1"=="!OPTION_INPUT!" (
-            set "KUBE_CONFIG=%DEFAULT_KUBE_CONFIG%"
-            echo - Cluster Config File [%DEFAULT_KUBE_CONFIG%]%COLON% !KUBE_CONFIG!
+            set "KUBE_CONFIG_FILE=%DEFAULT_KUBE_CONFIG_FILE%"
+            echo - Cluster Config File [%DEFAULT_KUBE_CONFIG_FILE%]%COLON% !KUBE_CONFIG_FILE!
             goto input_kube_apply
         )
-        set /p KUBE_CONFIG="- Cluster Config File [%DEFAULT_KUBE_CONFIG%]%COLON% "
-        if ""=="!KUBE_CONFIG!" (
+        set /p KUBE_CONFIG_FILE="- Cluster Config File [%DEFAULT_KUBE_CONFIG_FILE%]%COLON% "
+        if ""=="!KUBE_CONFIG_FILE!" (
             set /p CONTINUE="Continue using the default value [y/n]%COLON% "
             if /i not "y"=="!CONTINUE!" goto end
-            set "KUBE_CONFIG=%DEFAULT_KUBE_CONFIG%"
+            set "KUBE_CONFIG_FILE=%DEFAULT_KUBE_CONFIG_FILE%"
         )
     @rem Apply
     :input_kube_apply
-        if not ""=="!KUBE_APPLY!" (
-            echo - Cluster Apply File [!APP_NAME!\%DEFAULT_KUBE_APPLY%]%COLON% !KUBE_APPLY!
+        if not ""=="!KUBE_APPLY_FILE!" (
+            echo - Cluster Apply File [!APP_NAME!\%DEFAULT_KUBE_APPLY_FILE%]%COLON% !KUBE_APPLY_FILE!
             goto begin
         )
         if not "1"=="!OPTION_INPUT!" (
-            set "KUBE_APPLY=!APP_NAME!\%DEFAULT_KUBE_APPLY%"
-            echo - Cluster Apply File [!APP_NAME!\%DEFAULT_KUBE_APPLY%]%COLON% !KUBE_APPLY!
+            set "KUBE_APPLY_FILE=!APP_NAME!\%DEFAULT_KUBE_APPLY_FILE%"
+            echo - Cluster Apply File [!APP_NAME!\%DEFAULT_KUBE_APPLY_FILE%]%COLON% !KUBE_APPLY_FILE!
             goto begin
         )
-        set /p KUBE_APPLY="- Cluster Apply File [!APP_NAME!\%DEFAULT_KUBE_APPLY%]%COLON% "
-        if ""=="!KUBE_APPLY!" (
+        set /p KUBE_APPLY_FILE="- Cluster Apply File [!APP_NAME!\%DEFAULT_KUBE_APPLY_FILE%]%COLON% "
+        if ""=="!KUBE_APPLY_FILE!" (
             set /p CONTINUE="Continue using the default value [y/n]%COLON% "
             if /i not "y"=="!CONTINUE!" goto end
-            set "KUBE_APPLY=!APP_NAME!\%DEFAULT_KUBE_APPY%"
+            set "KUBE_APPLY_FILE=!APP_NAME!\%DEFAULT_KUBE_APPY%"
         )
 
 :required
@@ -512,7 +512,7 @@ if "%~1"=="" (
         goto docker_run
     )
     call :info "Compose Build Docker Image%COLON%"
-    call docker compose -f !DOCKER_COMPOSE! build --no-cache
+    call docker compose -f !DOCKER_COMPOSE_FILE! build --no-cache
     if errorlevel 1 (
         call :error "Failed to build the image"
         goto done
@@ -524,7 +524,7 @@ if "%~1"=="" (
         goto docker_clean
     )
     call :info "Compose Up Docker Image%COLON%"
-    call docker compose -f !DOCKER_COMPOSE! up -d
+    call docker compose -f !DOCKER_COMPOSE_FILE! up -d
     if errorlevel 1 (
         call :error "Failed to run the image"
         goto done
@@ -545,7 +545,7 @@ if "%~1"=="" (
         goto docker_wincred_add
     )
     call :info "List Docker Credentials%COLON%"
-    call !DOCKER_WINCRED! list
+    call !DOCKER_WINCRED_EXE! list
 
 :docker_wincred_add
     if not "1"=="!DOCK_WINCRED_ADD!" (
@@ -553,7 +553,7 @@ if "%~1"=="" (
         goto docker_wincred_view
     )
     call :info "Add Docker Credential%COLON%"
-    call echo !TARGET_REGISTRY! | !DOCKER_WINCRED! store
+    call echo !TARGET_REGISTRY_ENDPOINT! | !DOCKER_WINCRED_EXE! store
 
 :docker_wincred_view
     if not "1"=="!DOCK_WINCRED_VIEW!" (
@@ -561,7 +561,7 @@ if "%~1"=="" (
         goto docker_wincred_delete
     )
     call :info "View Docker Credential%COLON%"
-    call echo !TARGET_REGISTRY! | !DOCKER_WINCRED! get
+    call echo !TARGET_REGISTRY_ENDPOINT! | !DOCKER_WINCRED_EXE! get
 
 :docker_wincred_delete
     if not "1"=="!DOCK_WINCRED_DEL!" (
@@ -569,7 +569,7 @@ if "%~1"=="" (
         goto docker_push
     )
     call :info "Delete Docker Credential%COLON%"
-    call echo !TARGET_REGISTRY! | !DOCKER_WINCRED! erase
+    call echo !TARGET_REGISTRY_ENDPOINT! | !DOCKER_WINCRED_EXE! erase
 
 :docker_push
     if not "1"=="!OPTION_P!" (
@@ -637,7 +637,7 @@ if "%~1"=="" (
         goto kube_credential_add
     )
     call :info "List Kubernetes Registry Credentials%COLON%"
-    call kubectl --kubeconfig !KUBE_CONFIG! get secrets
+    call kubectl --kubeconfig !KUBE_CONFIG_FILE! get secrets
 
 :kube_credential_add
     if not "1"=="!KUBE_CRED_ADD!" (
@@ -645,7 +645,7 @@ if "%~1"=="" (
         goto kube_credential_view
     )
     call :info "Add Kubernetes Registry Credential%COLON%"
-    call kubectl --kubeconfig !KUBE_CONFIG! create secret docker-registry [Name] --docker-server=[Registry Endpoint] --docker-username=[Username] --docker-password=[Password] --docker-email=[Email]
+    call kubectl --kubeconfig !KUBE_CONFIG_FILE! create secret docker-registry [Name] --docker-server=[Registry Endpoint] --docker-username=[Username] --docker-password=[Password] --docker-email=[Email]
 
 :kube_credential_view
     if not "1"=="!KUBE_CRED_VIEW!" (
@@ -653,7 +653,7 @@ if "%~1"=="" (
         goto kube_credential_delete
     )
     call :info "View Kubernetes Registry Credential%COLON%"
-    call kubectl --kubeconfig !KUBE_CONFIG! get secret !KUBE_CRED! -o jsonpath={.data}
+    call kubectl --kubeconfig !KUBE_CONFIG_FILE! get secret !KUBE_CRED! -o jsonpath={.data}
 
 :kube_credential_delete
     if not "1"=="!KUBE_CRED_DEL!" (
@@ -661,7 +661,7 @@ if "%~1"=="" (
         goto kube_apply
     )
     call :info "Delete Kubernetes Registry Credential%COLON%"
-    call kubectl --kubeconfig !KUBE_CONFIG! delete secret !KUBE_CRED!
+    call kubectl --kubeconfig !KUBE_CONFIG_FILE! delete secret !KUBE_CRED!
 
 :kube_apply
     if not "1"=="!OPTION_A!" (
@@ -669,7 +669,7 @@ if "%~1"=="" (
         goto kube_delete
     )
     call :info "Apply Docker Image%COLON% !NCR_PRIVATE_IMAGE!"
-    call kubectl --kubeconfig !KUBE_CONFIG! apply -f !KUBE_APPLY!
+    call kubectl --kubeconfig !KUBE_CONFIG_FILE! apply -f !KUBE_APPLY_FILE!
     if errorlevel 1 (
         call :error "Failed to apply the image"
         goto done
@@ -681,7 +681,7 @@ if "%~1"=="" (
         goto done
     )
     call :info "Delete Docker Image%COLON% !NCR_PRIVATE_IMAGE!"
-    call kubectl --kubeconfig !KUBE_CONFIG! delete -f !KUBE_APPLY!
+    call kubectl --kubeconfig !KUBE_CONFIG_FILE! delete -f !KUBE_APPLY_FILE!
     if errorlevel 1 (
         call :error "Failed to apply the image"
         goto done
@@ -700,49 +700,49 @@ if "%~1"=="" (
 goto end
 
 :env
-    if ""=="!ORIGIN_REGISTRY!" (
+    if ""=="!ORIGIN_REGISTRY_ENDPOINT!" (
         set "ORIGIN_IMAGE=!APP_NAME!:!APP_VERSION!"
     ) else (
-        set "ORIGIN_IMAGE=!ORIGIN_REGISTRY!/!APP_NAME!:!APP_VERSION!"
+        set "ORIGIN_IMAGE=!ORIGIN_REGISTRY_ENDPOINT!/!APP_NAME!:!APP_VERSION!"
     )
-    if ""=="!TARGET_REGISTRY!" (
+    if ""=="!TARGET_REGISTRY_ENDPOINT!" (
         set "TARGET_IMAGE=!APP_NAME!:!APP_VERSION!"
     ) else (
-        set "TARGET_IMAGE=!TARGET_REGISTRY!/!APP_NAME!:!APP_VERSION!"
+        set "TARGET_IMAGE=!TARGET_REGISTRY_ENDPOINT!/!APP_NAME!:!APP_VERSION!"
     )
-    if not ""=="!NCR_PUBLIC!" (
-        set "NCR_PUBLIC_IMAGE=!NCR_PUBLIC!/!APP_NAME!:!APP_VERSION!"
+    if not ""=="!NCR_PUBLIC_ENDPOINT!" (
+        set "NCR_PUBLIC_IMAGE=!NCR_PUBLIC_ENDPOINT!/!APP_NAME!:!APP_VERSION!"
     )
-    if not ""=="!NCR_PRIVATE!" (
-        set "NCR_PRIVATE_IMAGE=!NCR_PRIVATE!/!APP_NAME!:!APP_VERSION!"
+    if not ""=="!NCR_PRIVATE_ENDPOINT!" (
+        set "NCR_PRIVATE_IMAGE=!NCR_PRIVATE_ENDPOINT!/!APP_NAME!:!APP_VERSION!"
     )
     call :info "Input%COLON%"
     call :info "  Application%COLON%"
     call :info "    Name%COLON% !APP_NAME!"
     call :info "    Version%COLON% !APP_VERSION!"
     call :info "    Build%COLON% !APP_Build!"
-    call :info "    Path%COLON% !APP_PATH!"
-    call :info "    Compose%COLON% !DOCKER_COMPOSE!"
+    call :info "    Path%COLON% !WORK_DIR!"
+    call :info "    Compose%COLON% !DOCKER_COMPOSE_FILE!"
     call :info "  Registry%COLON%"
     call :info "    Origin%COLON%"
-    call :info "      Endpoint%COLON% !ORIGIN_REGISTRY!"
+    call :info "      Endpoint%COLON% !ORIGIN_REGISTRY_ENDPOINT!"
     call :info "      Image%COLON% !ORIGIN_IMAGE!"
     call :info "    Target%COLON%"
-    call :info "      Endpoint%COLON% !TARGET_REGISTRY!"
+    call :info "      Endpoint%COLON% !TARGET_REGISTRY_ENDPOINT!"
     call :info "      Image%COLON% !TARGET_IMAGE!"
     call :info "    NCR%COLON%"
     call :info "      Public%COLON%"
-    call :info "        Endpoint%COLON% !NCR_PUBLIC!"
+    call :info "        Endpoint%COLON% !NCR_PUBLIC_ENDPOINT!"
     call :info "        Image%COLON% !NCR_PUBLIC_IMAGE!"
     call :info "      Private%COLON%"
-    call :info "        Endpoint%COLON% !NCR_PRIVATE!"
+    call :info "        Endpoint%COLON% !NCR_PRIVATE_ENDPOINT!"
     call :info "        Image%COLON% !NCR_PRIVATE_IMAGE!"
     call :info "  Kubernetes%COLON%"
     call :info "    Cluster%COLON%"
     call :info "      Name%COLON% !CLUSTER_NAME!"
-    call :info "      Path%COLON% !CLUSTER_PATH!"
-    call :info "      Config%COLON% !KUBE_CONFIG!"
-    call :info "      Apply%COLON% !KUBE_APPLY!"
+    call :info "      Path%COLON% !WORK_DIR!"
+    call :info "      Config%COLON% !KUBE_CONFIG_FILE!"
+    call :info "      Apply%COLON% !KUBE_APPLY_FILE!"
     call :info "  Active code page%COLON% !CHARSET!"
 
 :begin_at
@@ -834,10 +834,10 @@ goto end
     echo                   Tools%COLON%
     echo                     gradle
     echo                     npm
-    echo   -ap [path]      Application Path (DEFAULT%COLON% %SKY%%DEFAULT_ROOT%%NOCOLOR%\[Application Name])
-    echo   -do [endpoint]  Origin Registry Endpoint (DEFAULT%COLON% %SKY%%DEFAULT_ORIGIN_REGISTRY%%NOCOLOR%)
-    echo   -dt [endpoint]  Target Registry Endpoint (DEFAULT%COLON% %SKY%%DEFAULT_TARGET_REGISTRY%%NOCOLOR%)
-    echo   -dc [file]      Docker Compose File (DEFAULT%COLON% %SKY%%DEFAULT_DOCKER_COMPOSE%%NOCOLOR%)
+    echo   -ap [path]      Application Path (DEFAULT%COLON% %SKY%%DEFAULT_ROOT_DIR%%NOCOLOR%\[Application Name])
+    echo   -do [endpoint]  Origin Registry Endpoint (DEFAULT%COLON% %SKY%%DEFAULT_ORIGIN_REGISTRY_ENDPOINT%%NOCOLOR%)
+    echo   -dt [endpoint]  Target Registry Endpoint (DEFAULT%COLON% %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
+    echo   -dc [file]      Docker Compose File (DEFAULT%COLON% %SKY%%DEFAULT_DOCKER_COMPOSE_FILE%%NOCOLOR%)
     echo   -np [name]      NCloud Public Container Registry Name
     echo                   End Point Suffix%COLON% [Public Registry Name].%SKY%.kr.ncr.ntruss.com%NOCOLOR%
     echo   -ns [name]      NCloud Private Container Registry Name
@@ -904,14 +904,14 @@ goto end
     echo                     -an [Application Name]
     echo                     -av [Application Version]
     echo                     -do [Origin Registry Endpoint]
-    echo                     -np [NCloud Public Container Registry Name]
+    echo                     -np [NCR Public Endpoint]
     echo   -A              Apply Container
     echo                   Compatible Options%COLON%
     echo                      -SA
     echo                   Required Fields%COLON%
     echo                     -an [Application Name]
     echo                     -av [Application Version]
-    echo                     -ns [NCloud Private Container Registry Name]
+    echo                     -ns [NCR Private Endpoint]
     echo                     -kn [Kubernetes Cluster Name]
     echo                     -kc [Kubernetes Cluster Config File]
     echo                     -ka [Kubernetes Apply File]
@@ -930,25 +930,25 @@ goto end
     echo         -an app-name %CARET%
     echo         -av 1.0.0 %CARET%
     echo         -ab gradle %CARET%
-    echo         -ap %DEFAULT_ROOT%\app-name %CARET%
-    echo         -dt %DEFAULT_TARGET_REGISTRY% %CARET%
-    echo         -dc %DEFAULT_DOCKER_COMPOSE%
+    echo         -ap %DEFAULT_ROOT_DIR%\app-name %CARET%
+    echo         -dt %DEFAULT_TARGET_REGISTRY_ENDPOINT% %CARET%
+    echo         -dc %DEFAULT_DOCKER_COMPOSE_FILE%
     echo   -GBP%COLON% sdocker -GBP %CARET%
     echo         -an app-name %CARET%
     echo         -av 1.0.0 %CARET%
     echo         -ab gradle %CARET%
-    echo         -ap %DEFAULT_ROOT%\app-name %CARET%
-    echo         -dt %DEFAULT_TARGET_REGISTRY% %CARET%
-    echo         -dc %DEFAULT_DOCKER_COMPOSE%
+    echo         -ap %DEFAULT_ROOT_DIR%\app-name %CARET%
+    echo         -dt %DEFAULT_TARGET_REGISTRY_ENDPOINT% %CARET%
+    echo         -dc %DEFAULT_DOCKER_COMPOSE_FILE%
     echo   -SA%COLON% sdocker -SA %CARET%
     echo         -an app-name %CARET%
     echo         -av 1.0.0 %CARET%
-    echo         -do %DEFAULT_ORIGIN_REGISTRY% %CARET%
-    echo         -np ncr-public-name.%DEFAULT_NCR_PUBLIC_SUFFIX% %CARET%
-    echo         -ns ncr-private-name.%DEFAULT_NCR_PRIVATE_SUFFIX% %CARET%
+    echo         -do %DEFAULT_ORIGIN_REGISTRY_ENDPOINT% %CARET%
+    echo         -np [NCR Public Name].kr.ncr.ntruss.com %CARET%
+    echo         -ns [NCR Private Name].kr.private-ncr.ntruss.com %CARET%
     echo         -kn cluster-name %CARET%
-    echo         -kc %DEFAULT_ROOT%\cluster-name\%DEFAULT_KUBE_CONFIG% %CARET%
-    echo         -ka %DEFAULT_ROOT%\cluster-name\app-name\%DEFAULT_KUBE_APPLY%
+    echo         -kc %DEFAULT_ROOT_DIR%\cluster-name\%DEFAULT_KUBE_CONFIG_FILE% %CARET%
+    echo         -ka %DEFAULT_ROOT_DIR%\cluster-name\app-name\%DEFAULT_KUBE_APPLY_FILE%
     goto success
 
 :try
