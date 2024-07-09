@@ -65,7 +65,7 @@ set "OPTION="
         )
         set "COMMAND=!COMMANDS:~0,1!"
         if "image"=="!OPTION!" (
-            for %%a in (B I R P L) do (
+            for %%a in (A I R P L) do (
                 if "%%a"=="!COMMAND!" (
                     set "COMMAND_!COMMAND!=1"
                     echo set "COMMAND_!COMMAND!=1"
@@ -145,23 +145,10 @@ set "OPTION="
 
 @rem Input Fields
 :inputs
-    :input_cred
-        if not "wincred"=="!OPTION!" if not "nkscred"=="!OPTION!" if not "ncrcred"=="!OPTION!" goto input_application
-        if not "1"=="!COMMAND_W!" goto begin
-        echo Credential:
-        @rem Username
-        set /p CRED_USERNAME="- Userame []: "
-        if ""=="!CRED_USERNAME!" goto required
-        @rem Password
-        set /p CRED_PASSWORD="- Password []: "
-        if ""=="!CRED_PASSWORD!" goto required
-        @rem Email
-        if "ncrcred"=="!OPTION!" (
-            set /p CRED_EMAIL="- Email []: "
-            if ""=="!CRED_EMAIL!" goto required
-        )
-        goto begin
-    :input_application
+    if "wincred"=="!OPTION!" goto cred_inputs
+    if "nkscred"=="!OPTION!" goto cred_inputs
+    if "ncrcred"=="!OPTION!" goto cred_inputs
+    :image_inputs
         echo Application:
         @rem Application Name
         if not ""=="!FIELD_N!" (
@@ -179,6 +166,21 @@ set "OPTION="
             set /p APP_VERSION="- Version []: "
         )
         if ""=="!APP_VERSION!" goto required
+    :cred_inputs
+        if not "1"=="!COMMAND_W!" goto begin
+        echo Credential:
+        @rem Username
+        set /p CRED_USERNAME="- Userame []: "
+        if ""=="!CRED_USERNAME!" goto required
+        @rem Password
+        set /p CRED_PASSWORD="- Password []: "
+        if ""=="!CRED_PASSWORD!" goto required
+        @rem Email
+        if "ncrcred"=="!OPTION!" (
+            set /p CRED_EMAIL="- Email []: "
+            if ""=="!CRED_EMAIL!" goto required
+        )
+        goto begin
 
 :required
     echo.
@@ -191,186 +193,269 @@ set "OPTION="
 :fields
     call :info "Option: !OPTION!"
     call :info "Fields:"
-    :env_wincred
-        if not "wincred"=="!OPTION!" goto env_nkscred
-        if ""=="!FIELD_X!" (
-            set "EXE_FILE=%DEFAULT_DOCKER_WINCRED_EXE%"
-        ) else (
-            set "EXE_FILE=!FIELD_X!"
-        )
-        if ""=="!FIELD_T!" (
-            set "TARGET_REGISTRY_ENDPOINT=%DEFAULT_TARGET_REGISTRY_ENDPOINT%"
-        ) else (
-            set "TARGET_REGISTRY_ENDPOINT=!FIELD_T!"
-        )
-        call :info "  File: !EXE_FILE!"
-        call :info "  Registry:"
-        call :info "    Target:"
-        call :info "      Endpoint: !TARGET_REGISTRY_ENDPOINT!"
-        goto tasks
-    :env_nkscred
-        if not "nkscred"=="!OPTION!" goto env_application
-        if ""=="!FIELD_X!" (
-            set "EXE_FILE=%DEFAULT_NCP_IAM_EXE%"
-        ) else (
-            set "EXE_FILE=!FIELD_X!"
-        )
-        if ""=="!FIELD_C!" (
-            set "CLUSTER_NAME=%DEFAULT_CLUSTER_NAME%"
-        ) else (
-            set "CLUSTER_NAME=!FIELD_C!"
-        )
-        if ""=="!FIELD_D!" (
-            set "WORK_DIR=%DEFAULT_ROOT_DIR%\!CLUSTER_NAME!"
-        ) else (
-            set "WORK_DIR=!FIELD_D!"
-        )
-        if ""=="!FIELD_F!" (
-            set "KUBE_CONFIG_FILE=!WORK_DIR!\%DEFAULT_KUBE_CONFIG_FILE%"
-        ) else (
-            set "KUBE_CONFIG_FILE=!FIELD_F!"
-        )
-        if ""=="!FIELD_R!" (
-            set "NKS_REGION=%DEFAULT_NKS_REGION%"
-        ) else (
-            set "NKS_REGION=!FIELD_R!"
-        )
-        if ""=="!FIELD_U!" (
-            set "NKS_UUID=%DEFAULT_NKS_UUID%"
-        ) else (
-            set "NKS_UUID=!FIELD_U!"
-        )
-        call :info "  File: !EXE_FILE!"
-        call :info "  Kubernetes:"
-        call :info "    Cluster:"
-        call :info "      Name: !CLUSTER_NAME!"
-        if ""=="!CLUSTER_NAME!" (
-            call :error "Cluster name is required"
-            goto try
-        )
-        call :info "      File: !KUBE_CONFIG_FILE!"
-        call :info "      Region: !NKS_REGION!"
-        call :info "      UUID: !NKS_UUID!"
-        if ""=="!NKS_UUID!" (
-            call :error "Cluster UUID is required"
-            goto try
-        )
-        goto tasks
-    :env_ncrcred
-        if not "ncrcred"=="!OPTION!" goto env_application
-        if ""=="!FIELD_C!" (
-            set "CLUSTER_NAME=%DEFAULT_CLUSTER_NAME%"
-        ) else (
-            set "CLUSTER_NAME=!FIELD_C!"
-        )
-        if ""=="!FIELD_D!" (
-            set "WORK_DIR=%DEFAULT_ROOT_DIR%\!CLUSTER_NAME!"
-        ) else (
-            set "WORK_DIR=!FIELD_D!"
-        )
-        if ""=="!FIELD_F!" (
-            set "KUBE_CONFIG_FILE=!WORK_DIR!\%DEFAULT_KUBE_CONFIG_FILE%"
-        ) else (
-            set "KUBE_CONFIG_FILE=!FIELD_F!"
-        )
-        if ""=="!FIELD_T!" (
-            set "TARGET_REGISTRY_ENDPOINT=%DEFAULT_TARGET_REGISTRY_ENDPOINT%"
-        ) else (
-            set "TARGET_REGISTRY_ENDPOINT=!FIELD_T!"
-        )
-        if ""=="!FIELD_N!" (
-            set "CRED_NAME=!FIELD_N!"
-        )
-        call :info "  Registry:"
-        call :info "    Target:"
-        call :info "      Endpoint: !TARGET_REGISTRY_ENDPOINT!"
-        call :info "  Kubernetes:"
-        call :info "    Cluster:"
-        call :info "      Name: !CLUSTER_NAME!"
-        if ""=="!CLUSTER_NAME!" (
-            call :error "Cluster name is required"
+    if "wincred"=="!OPTION!" goto wincred_fields
+    if "nkscred"=="!OPTION!" goto nkscred_fields
+    if "ncrcred"=="!OPTION!" goto ncrcred_fields
+    if "ncp"=="!OPTION!" goto ncp_fields
+
+:image_fields
+    set "APP_NAME=!FIELD_N!"
+    set "APP_VERSION=!FIELD_V!"
+    if ""=="!FIELD_D!" (
+        set "WORK_DIR=%DEFAULT_ROOT_DIR%\!APP_NAME!"
+    ) else (
+        set "WORK_DIR=!FIELD_D!"
+    )
+    if "gradle"=="!FIELD_B!" (
+        set "BUILD_TOOL=gradle"
+    )
+    if "npm"=="!FIELD_B!" (
+        set "BUILD_TOOL=npm"
+    )
+    if ""=="!FIELD_T!" (
+        set "TARGET_REGISTRY_ENDPOINT=%DEFAULT_TARGET_REGISTRY_ENDPOINT%"
+    ) else (
+        set "TARGET_REGISTRY_ENDPOINT=!FIELD_T!"
+    )
+    if ""=="!TARGET_REGISTRY_ENDPOINT!" (
+        set "TARGET_IMAGE=!APP_NAME!:!APP_VERSION!"
+    ) else (
+        set "TARGET_IMAGE=!TARGET_REGISTRY_ENDPOINT!/!APP_NAME!:!APP_VERSION!"
+    )
+    if ""=="!FIELD_O!" (
+        set "ORIGIN_REGISTRY_ENDPOINT=%DEFAULT_ORIGIN_REGISTRY_ENDPOINT%"
+    ) else (
+        set "ORIGIN_REGISTRY_ENDPOINT=!FIELD_O!"
+    )
+    if ""=="!ORIGIN_REGISTRY_ENDPOINT!" (
+        set "ORIGIN_IMAGE=!APP_NAME!:!APP_VERSION!"
+    ) else (
+        set "ORIGIN_IMAGE=!ORIGIN_REGISTRY_ENDPOINT!/!APP_NAME!:!APP_VERSION!"
+    )
+    if ""=="!FIELD_F!" (
+        set "DOCKER_COMPOSE_FILE=%DEFAULT_ROOT_DIR%\!APP_NAME!\%DEFAULT_DOCKER_COMPOSE_FILE%"
+    ) else (
+        set "DOCKER_COMPOSE_FILE=!FIELD_F!"
+    )
+    call :info "  Application:"
+    call :info "    Name: !APP_NAME!"
+    call :info "    Version: !APP_VERSION!"
+    call :info "    Directory: !WORK_DIR!"
+    call :info "  Build:"
+    call :info "    Tool: !BUILD_TOOL!"
+    call :info "  Registry:"
+    call :info "    Origin:"
+    call :info "      Endpoint: !ORIGIN_REGISTRY_ENDPOINT!"
+    call :info "      Image: !ORIGIN_IMAGE!"
+    call :info "    Target:"
+    call :info "      Endpoint: !TARGET_REGISTRY_ENDPOINT!"
+    call :info "      Image: !TARGET_IMAGE!"
+    call :info "  Docker:"
+    call :info "    Compose:"
+    call :info "      File: !DOCKER_COMPOSE_FILE!"
+    goto tasks
+
+:wincred_fields
+    if ""=="!FIELD_X!" (
+        set "EXE_FILE=%DEFAULT_DOCKER_WINCRED_EXE%"
+    ) else (
+        set "EXE_FILE=!FIELD_X!"
+    )
+    if ""=="!FIELD_T!" (
+        set "TARGET_REGISTRY_ENDPOINT=%DEFAULT_TARGET_REGISTRY_ENDPOINT%"
+    ) else (
+        set "TARGET_REGISTRY_ENDPOINT=!FIELD_T!"
+    )
+    call :info "  File: !EXE_FILE!"
+    call :info "  Registry:"
+    call :info "    Target:"
+    call :info "      Endpoint: !TARGET_REGISTRY_ENDPOINT!"
+    goto tasks
+
+:nkscred_fields
+    if ""=="!FIELD_X!" (
+        set "EXE_FILE=%DEFAULT_NCP_IAM_EXE%"
+    ) else (
+        set "EXE_FILE=!FIELD_X!"
+    )
+    if ""=="!FIELD_C!" (
+        set "CLUSTER_NAME=%DEFAULT_CLUSTER_NAME%"
+    ) else (
+        set "CLUSTER_NAME=!FIELD_C!"
+    )
+    if ""=="!FIELD_D!" (
+        set "WORK_DIR=%DEFAULT_ROOT_DIR%\!CLUSTER_NAME!"
+    ) else (
+        set "WORK_DIR=!FIELD_D!"
+    )
+    if ""=="!FIELD_F!" (
+        set "KUBE_CONFIG_FILE=!WORK_DIR!\%DEFAULT_KUBE_CONFIG_FILE%"
+    ) else (
+        set "KUBE_CONFIG_FILE=!FIELD_F!"
+    )
+    if ""=="!FIELD_R!" (
+        set "NKS_REGION=%DEFAULT_NKS_REGION%"
+    ) else (
+        set "NKS_REGION=!FIELD_R!"
+    )
+    if ""=="!FIELD_U!" (
+        set "NKS_UUID=%DEFAULT_NKS_UUID%"
+    ) else (
+        set "NKS_UUID=!FIELD_U!"
+    )
+    call :info "  File: !EXE_FILE!"
+    call :info "  Kubernetes:"
+    call :info "    Cluster:"
+    call :info "      Name: !CLUSTER_NAME!"
+    call :info "      File: !KUBE_CONFIG_FILE!"
+    call :info "      Region: !NKS_REGION!"
+    call :info "      UUID: !NKS_UUID!"
+    goto tasks
+
+:ncrcred_fields
+    if ""=="!FIELD_C!" (
+        set "CLUSTER_NAME=%DEFAULT_CLUSTER_NAME%"
+    ) else (
+        set "CLUSTER_NAME=!FIELD_C!"
+    )
+    if ""=="!FIELD_D!" (
+        set "WORK_DIR=%DEFAULT_ROOT_DIR%\!CLUSTER_NAME!"
+    ) else (
+        set "WORK_DIR=!FIELD_D!"
+    )
+    if ""=="!FIELD_F!" (
+        set "KUBE_CONFIG_FILE=!WORK_DIR!\%DEFAULT_KUBE_CONFIG_FILE%"
+    ) else (
+        set "KUBE_CONFIG_FILE=!FIELD_F!"
+    )
+    if ""=="!FIELD_T!" (
+        set "TARGET_REGISTRY_ENDPOINT=%DEFAULT_TARGET_REGISTRY_ENDPOINT%"
+    ) else (
+        set "TARGET_REGISTRY_ENDPOINT=!FIELD_T!"
+    )
+    if ""=="!FIELD_N!" (
+        set "CRED_NAME=!FIELD_N!"
+    )
+    call :info "  Registry:"
+    call :info "    Target:"
+    call :info "      Endpoint: !TARGET_REGISTRY_ENDPOINT!"
+    call :info "  Kubernetes:"
+    call :info "    Cluster:"
+    call :info "      Name: !CLUSTER_NAME!"
+    call :info "      File: !KUBE_CONFIG_FILE!"
+    call :info "    Credential:"
+    call :info "      Name: !CRED_NAME!"
+    goto tasks
+
+:tasks
+    if "wincred"=="!OPTION!" goto wincred_tasks
+    if "nkscred"=="!OPTION!" goto nkscred_tasks
+    if "ncrcred"=="!OPTION!" goto ncrcred_tasks
+    if "ncp"=="!OPTION!" goto ncp_tasks
+
+:image_tasks
+    if "1"=="!COMMAND_A!" (
+        if ""=="!BUILD_TOOL!" (
+            call :error "Build tool is required"
             goto try
         )
         cd /d "!WORK_DIR!" >nul 2>&1
         if errorlevel 1 (
             call :error "'!WORK_DIR!' does not exist"
-            goto try
+            goto done
         )
-        call :info "      File: !KUBE_CONFIG_FILE!"
-        if not exist !KUBE_CONFIG_FILE! (
-            call :error "'!KUBE_CONFIG_FILE!' does not exist"
-            goto try
+        if "gradle"=="!BUILD_TOOL!" (
+            call :info "Build with Gradle:"
+            call gradlew.bat clean build --refresh-dependencies -Pver=!APP_VERSION!
         )
-        call :info "    Credential:"
-        call :info "      Name: !CRED_NAME!"
-        if ""=="!CRED_NAME!" if not "1"=="!COMMAND_L!" (
-            call :error "Credential name is required"
-            goto try
+        if "npm"=="!BUILD_TOOL!" (
+            call :info "Build with NPM:"
+            call npm run build
         )
-        goto tasks
-    :env_application
-        set "APP_NAME=!FIELD_N!"
-        set "APP_VERSION=!FIELD_V!"
-        if "image"=="!OPTION!" (
-            if ""=="!FIELD_D!" (
-                set "WORK_DIR=%DEFAULT_ROOT_DIR%\!APP_NAME!"
-            ) else (
-                set "WORK_DIR=!FIELD_D!"
-            )
-            if "gradle"=="!FIELD_B!" (
-                set "BUILD_TOOL=gradle"
-            )
-            if "npm"=="!FIELD_B!" (
-                set "BUILD_TOOL=npm"
-            )
-            if ""=="!FIELD_F!" (
-                set "DOCKER_COMPOSE_FILE="
-            ) else (
-                set "DOCKER_COMPOSE_FILE=%DEFAULT_DOCKER_COMPOSE_FILE%"
-            )
+        if errorlevel 1 (
+            call :error "Failed to build with !BUILD_TOOL!"
+            goto done
         )
-        call :info "  Application:"
-        call :info "    Name: !FIELD_N!"
-        call :info "    Version: !FIELD_V!"
-
-:tasks
-
-:image_tasks
-    if not "image"=="!OPTION!" goto wincred_tasks
+    )
+    if "1"=="!COMMAND_I!" (
+        cd /d "!WORK_DIR!" >nul 2>&1
+        if errorlevel 1 (
+            call :error "'!WORK_DIR!' does not exist"
+            goto done
+        )
+        call :info "Build Docker Image:"
+        call docker compose -f !DOCKER_COMPOSE_FILE! build --no-cache
+        if errorlevel 1 (
+            call :error "Failed to build '!TARGET_IMAGE!'"
+            goto done
+        )
+    )
+    :image_skip_directory
+    if "1"=="!COMMAND_R!" (
+        call :info "Run Docker Image:"
+        call docker compose -f !DOCKER_COMPOSE_FILE! up -d
+        if errorlevel 1 (
+            call :error "Failed to run '!TARGET_IMAGE!'"
+            goto done
+        )
+    )
+    if "1"=="!COMMAND_P!" (
+        call :info "Push Docker Image:"
+        call docker image push !TARGET_IMAGE!
+        if errorlevel 1 (
+            call :error "Failed to push '!TARGET_IMAGE!'"
+            goto done
+        )
+    )
+    if "1"=="!COMMAND_L!" (
+        call :info "Pull Docker Image:"
+        call docker image pull !ORIGIN_IMAGE!
+        if errorlevel 1 (
+            call :error "Failed to pull '!ORIGIN_IMAGE!'"
+            goto done
+        )
+    )
+    goto done
 
 :wincred_tasks
-    if not "wincred"=="!OPTION!" goto nkscred_tasks
-    :wincred_delete
-        if not "1"=="!COMMAND_D!" goto wincred_update
-        call :info "Delete Docker Registry Credential:"
-        call echo !TARGET_REGISTRY_ENDPOINT! | !EXE_FILE! erase
-        goto wincred_list
-    :wincred_update
-        if not "1"=="!COMMAND_W!" goto wincred_show
-        call :info "Update Docker Registry Credential:"
-        call echo {"ServerURL":"!TARGET_REGISTRY_ENDPOINT!","Username":"!CRED_USERNAME!","Secret":"!CRED_PASSWORD!"} | !EXE_FILE! store
-        goto wincred_list
-    :wincred_show
-        if not "1"=="!COMMAND_R!" goto wincred_list
-        call :info "Show Docker Registry Credential:"
-        call echo !TARGET_REGISTRY_ENDPOINT! | !EXE_FILE! get
-        goto done
+    if "1"=="!COMMAND_R!" goto wincred_show
+    if "1"=="!COMMAND_W!" goto wincred_update
+    if "1"=="!COMMAND_D!" goto wincred_delete
     :wincred_list
         call :info "List Docker Registry Credentials:"
         call !EXE_FILE! list
         goto done
+    :wincred_show
+        call :info "Show Docker Registry Credential:"
+        call echo !TARGET_REGISTRY_ENDPOINT! | !EXE_FILE! get
+        goto done
+    :wincred_update
+        call :info "Update Docker Registry Credential:"
+        call echo {"ServerURL":"!TARGET_REGISTRY_ENDPOINT!","Username":"!CRED_USERNAME!","Secret":"!CRED_PASSWORD!"} | !EXE_FILE! store
+        goto wincred_list
+    :wincred_delete
+        call :info "Delete Docker Registry Credential:"
+        call echo !TARGET_REGISTRY_ENDPOINT! | !EXE_FILE! erase
+        goto wincred_list
 
 :nkscred_tasks
-    if not "nkscred"=="!OPTION!" goto ncrcred_tasks
+    if ""=="!CLUSTER_NAME!" (
+        call :error "Cluster name is required"
+        goto try
+    )
+    if ""=="!NKS_UUID!" (
+        call :error "Cluster UUID is required"
+        goto try
+    )
     :wincred_update
         call :info "Update NCR Credential:"
         set "NCP_CONFIGURE=%UserProfile%\.ncloud\configure"
         if exist !NCP_CONFIGURE! (
             call del !NCP_CONFIGURE!
-        )
-        if errorlevel 1 (
-            call :error "Failed to delete '!NCP_CONFIGURE!'"
-            goto fail
+            if errorlevel 1 (
+                call :error "Failed to delete '!NCP_CONFIGURE!'"
+                goto done
+            )
         )
         call echo ncloud_access_key_id     = !CRED_USERNAME!> !NCP_CONFIGURE!
         call echo ncloud_secret_access_key = !CRED_PASSWORD!>> !NCP_CONFIGURE!
@@ -379,29 +464,31 @@ set "OPTION="
         goto done
 
 :ncrcred_tasks
-    if not "ncrcred"=="!OPTION!" goto ncp_tasks
-    :ncrcred_delete
-        if not "1"=="!COMMAND_D!" goto ncrcred_update
-        call :info "Delete NCR Credential:"
-        call kubectl --kubeconfig !KUBE_CONFIG_FILE! delete secret !CRED_NAME!
-        goto ncrcred_list
-    :ncrcred_update
-        if not "1"=="!COMMAND_W!" goto ncrcred_show
-        call :info "Update NCR Credential:"
-        call kubectl --kubeconfig !KUBE_CONFIG_FILE! create secret docker-registry !CRED_NAME! --docker-server=!TARGET_REGISTRY_ENDPOINT! --docker-username=!CRED_USERNAME! --docker-password=!CRED_PASSWORD! --docker-email=!CRED_EMAIL!
-        goto ncrcred_list
-    :ncrcred_show
-        if not "1"=="!COMMAND_R!" goto ncrcred_list
-        call :info "Show NCR Credential:"
-        call kubectl --kubeconfig !KUBE_CONFIG_FILE! get secret !CRED_NAME!
-        goto done
+    if ""=="!CRED_NAME!" (
+        call :error "Credential name is required"
+        goto try
+    )
+    if "1"=="!COMMAND_R!" goto ncrcred_show
+    if "1"=="!COMMAND_W!" goto ncrcred_update
+    if "1"=="!COMMAND_D!" goto ncrcred_delete
     :ncrcred_list
         call :info "List NCR Credentials:"
         call kubectl --kubeconfig !KUBE_CONFIG_FILE! get secrets
         goto done
+    :ncrcred_show
+        call :info "Show NCR Credential:"
+        call kubectl --kubeconfig !KUBE_CONFIG_FILE! get secret !CRED_NAME!
+        goto done
+    :ncrcred_update
+        call :info "Update NCR Credential:"
+        call kubectl --kubeconfig !KUBE_CONFIG_FILE! create secret docker-registry !CRED_NAME! --docker-server=!TARGET_REGISTRY_ENDPOINT! --docker-username=!CRED_USERNAME! --docker-password=!CRED_PASSWORD! --docker-email=!CRED_EMAIL!
+        goto ncrcred_list
+    :ncrcred_delete
+        call :info "Delete NCR Credential:"
+        call kubectl --kubeconfig !KUBE_CONFIG_FILE! delete secret !CRED_NAME!
+        goto ncrcred_list
 
 :ncp_tasks
-    if not "ncp"=="!OPTION!" goto done
 
 :done
     call :end_at
@@ -421,7 +508,7 @@ goto end
     echo     help     Get help for for more information
     echo     image    Image Tasks
     echo              Commands:
-    echo                -B  Build Application
+    echo                -A  Build Application
     echo                    Required Fields:
     echo                      -n [name]       Application Name
     echo                      -v [version]    Application Version
@@ -612,6 +699,7 @@ goto end
 :try
     echo.
     echo Use 'sdocker help' for more information
+    echo.
     goto fail
 
 :success
