@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: application-name
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: application-name
+  template:
+    metadata:
+      labels:
+        app: application-name
+  spec:
+    imagePullSecrets:
+    - name: kesg-infra
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - application-name
+            topologyKey: kubernetes.io/hostname
+          weight: 10
+    containers:
+    - name: application-name
+      readinessProbe:
+        httpGet:
+          path: /rest/reflect/get
+          port: 8080
+        initialDelaySeconds: 10
+        periodSeconds: 20
+      livenessProbe:
+        httpGet:
+          path: /rest/reflect/get
+          port: 8080
+        initialDelaySeconds: 20
+        periodSeconds: 20
+      image: application-name:1.0.0
+      ports:
+      - containerPort: 8080
+      env:
+      - name: JAVA_TOOL_OPTIONS
+        value: >
+          -XX:+UseContainerSupport
+          -XX:InitialRAMPercentage=40.0
+          -XX:MaxRAMPercentage=40.0
+          -Dfile.encoding=UTF-8
+          -Duser.timezone=Asia/Seoul
+          -Dspring.profiles.active=dev
+          -Daccess.authenticated.expressions=hasIpAddress("'127.0.0.1'"),hasIpAddress("'172.16.0.0/12'")
+          -Ddatasources.datasource0.url=jdbc:postgresql://host:port/databasename
+          -Ddatasources.datasource0.username=
+          -Ddatasources.datasource0.password=
+          -Ddatasources.datasource1.url=jdbc:postgresql://host:port/databasename
+          -Ddatasources.datasource1.username=
+          -Ddatasources.datasource1.password=

@@ -2,7 +2,7 @@
 
 ### Usage
 
-##### View Help
+##### Show Help
 
 ```cmd
 sdocker -h
@@ -31,11 +31,27 @@ notepad %UserProfile%\.seung\bin\sdocker.ini
 ```
 
 ```cmd
-setx SEUNG_PATH %UserProfile%\.seung
+curl -LO https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v[Kustomize Version]/kustomize_v[Kustomize Version]_windows_amd64.zip
 ```
 
 ```cmd
-setx PATH "%PATH%;%SEUNG_PATH%\bin"
+tar -xf kustomize_v[Kustomize Version]_windows_amd64.zip
+```
+
+```cmd
+move kustomize.exe %UserProfile%\.seung\bin\kustomize.exe
+```
+
+```cmd
+curl -o ncp-iam-authenticator.exe -L https://github.com/NaverCloudPlatform/ncp-iam-authenticator/releases/latest/download/ncp-iam-authenticator_windows_amd64.exe
+```
+
+```cmd
+move ncp-iam-authenticator.exe %UserProfile%\.seung\bin\ncp-iam-authenticator.exe
+```
+
+```cmd
+setx PATH "%PATH%;%UserProfile%\.seung\bin"
 ```
 
 > [!NOTE]
@@ -64,3 +80,5 @@ setx PATH "%PATH%;%SEUNG_PATH%\bin"
 [Writing a Dockerfile](https://docs.docker.com/guides/docker-concepts/building-images/writing-a-dockerfile/)
 
 [Docker Compose Quickstart](https://docs.docker.com/compose/gettingstarted/)
+
+[Kustomize Releases](https://github.com/kubernetes-sigs/kustomize/releases)

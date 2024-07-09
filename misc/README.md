@@ -68,12 +68,14 @@ mkdir %UserProfile%\.seung\bin
 ```
 
 ```cmd
-setx SEUNG_PATH %UserProfile%\.seung
-```
-
-```cmd
-setx PATH "%PATH%;%SEUNG_PATH%\bin"
+setx PATH "%PATH%;%UserProfile%\.seung\bin"
 ```
 
 > [!NOTE]
 > Use [Administrator: Command Prompt]
+
+##### List System Path
+
+```cmd
+echo %path:;=|find /i "[Search Words]"&echo.%
+```
