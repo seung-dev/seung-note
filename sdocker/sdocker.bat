@@ -167,8 +167,8 @@ set "OPTION="
             set /p APP_VERSION="- Version []: "
         )
         if ""=="!APP_VERSION!" goto required
+        goto begin
     :cred_inputs
-        if not "1"=="!COMMAND_W!" goto begin
         echo Credential:
         @rem Username
         set /p CRED_USERNAME="- Userame []: "
@@ -255,6 +255,7 @@ set "OPTION="
     call :info "  Docker:"
     call :info "    Compose:"
     call :info "      File: !DOCKER_COMPOSE_FILE!"
+    goto image_tasks
 
 :image_tasks
     if "1"=="!COMMAND_A!" (
@@ -349,12 +350,15 @@ set "OPTION="
     call :info "  Registry:"
     call :info "    Target:"
     call :info "      Endpoint: !TARGET_REGISTRY_ENDPOINT!"
+    goto wincred_tasks
 
 :wincred_tasks
     if "1"=="!COMMAND_L!" goto wincred_list
     if "1"=="!COMMAND_R!" goto wincred_show
     if "1"=="!COMMAND_W!" goto wincred_update
     if "1"=="!COMMAND_D!" goto wincred_delete
+    call :error "Unknown command"
+    goto fail
     :wincred_list
         call :info "List Docker Registry Credentials:"
         call !EXE_FILE! list
@@ -415,6 +419,7 @@ set "OPTION="
     call :info "      File: !KUBECONFIG_FILE!"
     call :info "      Region: !NKS_REGION!"
     call :info "      UUID: !NKS_UUID!"
+    goto nkscred_tasks
 
 :nkscred_tasks
     if ""=="!CLUSTER_NAME!" (
@@ -481,6 +486,7 @@ set "OPTION="
     call :info "      File: !KUBECONFIG_FILE!"
     call :info "    Credential:"
     call :info "      Name: !CRED_NAME!"
+    goto ncrcred_tasks
 
 :ncrcred_tasks
     if ""=="!CRED_NAME!" (
@@ -491,6 +497,8 @@ set "OPTION="
     if "1"=="!COMMAND_R!" goto ncrcred_show
     if "1"=="!COMMAND_W!" goto ncrcred_update
     if "1"=="!COMMAND_D!" goto ncrcred_delete
+    call :error "Unknown command"
+    goto fail
     :ncrcred_list
         call :info "List NCR Credentials:"
         call kubectl --kubeconfig !KUBECONFIG_FILE! get secrets
@@ -512,7 +520,12 @@ set "OPTION="
 :ncp_job
 
 :ncp_fields
-    if "1"=="!COMMAND_M!" (
+    if "1"=="!COMMAND_M!" goto ncp_mapping_m
+    if "1"=="!COMMAND_A!" goto ncp_mapping_a
+    if "1"=="!COMMAND_D!" goto ncp_mapping_a
+    call :error "Unknown command"
+    goto fail
+    :ncp_mapping_m
         if ""=="!FIELD_O!" (
             set "ORIGIN_REGISTRY_ENDPOINT=%DEFAULT_ORIGIN_REGISTRY_ENDPOINT%"
         ) else (
@@ -533,8 +546,8 @@ set "OPTION="
         ) else (
             set "TARGET_IMAGE=!TARGET_REGISTRY_ENDPOINT!/!APP_NAME!:!APP_VERSION!"
         )
-    )
-    if "1"=="!COMMAND_A!" (
+        goto ncp_mapping
+    :ncp_mapping_a
         if ""=="!FIELD_T!" (
             set "TARGET_REGISTRY_ENDPOINT=%DEFAULT_NCR_PRIVATE_ENDPOINT%"
         ) else (
@@ -545,49 +558,57 @@ set "OPTION="
         ) else (
             set "TARGET_IMAGE=!TARGET_REGISTRY_ENDPOINT!/!APP_NAME!:!APP_VERSION!"
         )
-    )
-    if ""=="!FIELD_C!" (
-        set "CLUSTER_NAME=%DEFAULT_CLUSTER_NAME%"
-    ) else (
-        set "CLUSTER_NAME=!FIELD_C!"
-    )
-    if ""=="!FIELD_D!" (
-        set "WORK_DIR=%DEFAULT_ROOT_DIR%\!CLUSTER_NAME!"
-    ) else (
-        set "WORK_DIR=!FIELD_D!"
-    )
-    if ""=="!FIELD_F!" (
-        set "KUBECONFIG_FILE=!WORK_DIR!\%DEFAULT_KUBECONFIG_FILE%"
-    ) else (
-        set "KUBECONFIG_FILE=!FIELD_F!"
-    )
-    if ""=="!FIELD_K!" (
-        set "KUSTOMIZE_DIR=!WORK_DIR!\!APP_NAME!"
-    ) else (
-        set "KUSTOMIZE_DIR=!FIELD_K!"
-    )
-    call :info "Option: !OPTION!"
-    call :info "Fields:"
-    call :info "  Registry:"
-    call :info "    Origin:"
-    call :info "      Endpoint: !ORIGIN_REGISTRY_ENDPOINT!"
-    call :info "      Image: !ORIGIN_IMAGE!"
-    call :info "    Target:"
-    call :info "      Endpoint: !TARGET_REGISTRY_ENDPOINT!"
-    call :info "      Image: !TARGET_IMAGE!"
-    call :info "  Kubernetes:"
-    call :info "    Cluster:"
-    call :info "      Name: !CLUSTER_NAME!"
-    call :info "      File: !KUBECONFIG_FILE!"
-    call :info "    Kustomize:"
-    call :info "      Directory: !KUSTOMIZE_DIR!"
+        goto ncp_mapping
+    :ncp_mapping
+        if ""=="!FIELD_C!" (
+            set "CLUSTER_NAME=%DEFAULT_CLUSTER_NAME%"
+        ) else (
+            set "CLUSTER_NAME=!FIELD_C!"
+        )
+        if ""=="!FIELD_D!" (
+            set "WORK_DIR=%DEFAULT_ROOT_DIR%\!CLUSTER_NAME!"
+        ) else (
+            set "WORK_DIR=!FIELD_D!"
+        )
+        if ""=="!FIELD_F!" (
+            set "KUBECONFIG_FILE=!WORK_DIR!\%DEFAULT_KUBECONFIG_FILE%"
+        ) else (
+            set "KUBECONFIG_FILE=!FIELD_F!"
+        )
+        if ""=="!FIELD_K!" (
+            set "KUSTOMIZE_DIR=!WORK_DIR!\!APP_NAME!"
+        ) else (
+            set "KUSTOMIZE_DIR=!FIELD_K!"
+        )
+        call :info "Option: !OPTION!"
+        call :info "Fields:"
+        call :info "  Registry:"
+        call :info "    Origin:"
+        call :info "      Endpoint: !ORIGIN_REGISTRY_ENDPOINT!"
+        call :info "      Image: !ORIGIN_IMAGE!"
+        call :info "    Target:"
+        call :info "      Endpoint: !TARGET_REGISTRY_ENDPOINT!"
+        call :info "      Image: !TARGET_IMAGE!"
+        call :info "  Kubernetes:"
+        call :info "    Cluster:"
+        call :info "      Name: !CLUSTER_NAME!"
+        call :info "      File: !KUBECONFIG_FILE!"
+        call :info "    Kustomize:"
+        call :info "      Directory: !KUSTOMIZE_DIR!"
+        goto ncp_tasks
+    goto fail
 
 :ncp_tasks
     if ""=="!CLUSTER_NAME!" (
         call :error "Cluster name is required"
         goto fail
     )
-    if "1"=="!COMMAND_M!" (
+    if "1"=="!COMMAND_M!" goto ncp_task_m
+    if "1"=="!COMMAND_A!" goto ncp_task_a
+    if "1"=="!COMMAND_D!" goto ncp_task_d
+    call :error "Unknown command"
+    goto fail
+    :ncp_task_m
         call :info "Pull Origin Image:"
         call docker image pull !ORIGIN_IMAGE!
         if errorlevel 1 (
@@ -618,8 +639,8 @@ set "OPTION="
             call :error "Failed to delete '!TARGET_IMAGE!'"
             goto done
         )
-    )
-    if "1"=="!COMMAND_A!" (
+        goto done
+    :ncp_task_a
         cd /d "!KUSTOMIZE_DIR!" >nul 2>&1
         if errorlevel 1 (
             call :error "'!KUSTOMIZE_DIR!' does not exist"
@@ -636,8 +657,26 @@ set "OPTION="
             call :error "Failed to apply '!TARGET_IMAGE!'"
             goto done
         )
-    )
-    goto done
+        goto done
+    :ncp_task_d
+        cd /d "!KUSTOMIZE_DIR!" >nul 2>&1
+        if errorlevel 1 (
+            call :error "'!KUSTOMIZE_DIR!' does not exist"
+            goto done
+        )
+        call :info "Apply Docker Image:"
+        call kustomize edit set image !APP_NAME!=!TARGET_IMAGE!
+        if errorlevel 1 (
+            call :error "Failed to edit '!TARGET_IMAGE!'"
+            goto done
+        )
+        call kubectl kustomize ./ | kubectl --kubeconfig !KUBECONFIG_FILE! delete -f -
+        if errorlevel 1 (
+            call :error "Failed to apply '!TARGET_IMAGE!'"
+            goto done
+        )
+        goto done
+    goto fail
 
 :done
     call :end_at
@@ -742,14 +781,14 @@ goto end
     echo                -L  List Credentials
     echo                    Required Fields:
     echo                      -c [name]       Cluster Name
-    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%)
+    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%)
     echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo                -W  Update Credential
     echo                    Required Fields:
     echo                      -c [name]       Cluster Name
-    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%)
+    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%)
     echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -n [name]       Credential Name
@@ -757,7 +796,7 @@ goto end
     echo                -R  Show Credential
     echo                    Required Fields:
     echo                      -c [name]       Cluster Name
-    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%)
+    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%)
     echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -n [name]       Credential Name
@@ -765,7 +804,7 @@ goto end
     echo                -D  Delete Credential
     echo                    Required Fields:
     echo                      -c [name]       Cluster Name
-    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%)
+    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%)
     echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -n [name]       Credential Name
@@ -785,12 +824,19 @@ goto end
     echo                      -n [name]       Application Name
     echo                      -v [version]    Application Version
     echo                      -c [name]       Cluster Name
-    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%)
+    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%)
     echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_NCR_PRIVATE_ENDPOINT%%NOCOLOR%)
     echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo                -D  Delete Deployment and Service
-    echo                    %YELLOW%Under Construction%NOCOLOR%
+    echo                    Required Fields:
+    echo                      -n [name]       Application Name
+    echo                      -v [version]    Application Version
+    echo                      -c [name]       Cluster Name
+    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%)
+    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
+    echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_NCR_PRIVATE_ENDPOINT%%NOCOLOR%)
+    echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo.
     goto end
 
