@@ -396,9 +396,9 @@ set "OPTION="
         set "WORK_DIR=!FIELD_D!"
     )
     if ""=="!FIELD_F!" (
-        set "KUBE_CONFIG_FILE=!WORK_DIR!\%DEFAULT_KUBE_CONFIG_FILE%"
+        set "KUBECONFIG_FILE=!WORK_DIR!\%DEFAULT_KUBECONFIG_FILE%"
     ) else (
-        set "KUBE_CONFIG_FILE=!FIELD_F!"
+        set "KUBECONFIG_FILE=!FIELD_F!"
     )
     if ""=="!FIELD_R!" (
         set "NKS_REGION=%DEFAULT_NKS_REGION%"
@@ -414,7 +414,7 @@ set "OPTION="
     call :info "  Kubernetes:"
     call :info "    Cluster:"
     call :info "      Name: !CLUSTER_NAME!"
-    call :info "      File: !KUBE_CONFIG_FILE!"
+    call :info "      File: !KUBECONFIG_FILE!"
     call :info "      Region: !NKS_REGION!"
     call :info "      UUID: !NKS_UUID!"
 
@@ -439,9 +439,9 @@ set "OPTION="
     call echo ncloud_access_key_id     = !CRED_USERNAME!> !NCP_CONFIGURE!
     call echo ncloud_secret_access_key = !CRED_PASSWORD!>> !NCP_CONFIGURE!
     call echo ncloud_api_url           = https://ncloud.apigw.ntruss.com>> !NCP_CONFIGURE!
-    call !EXE_FILE! create-kubeconfig --output !KUBE_CONFIG_FILE! --region !NKS_REGION! --clusterName !CLUSTER_NAME! --clusterUuid !NKS_UUID!
+    call !EXE_FILE! create-kubeconfig --output !KUBECONFIG_FILE! --region !NKS_REGION! --clusterName !CLUSTER_NAME! --clusterUuid !NKS_UUID!
     if errorlevel 1 (
-        call :error "Failed to update '!KUBE_CONFIG_FILE!'"
+        call :error "Failed to update '!KUBECONFIG_FILE!'"
         goto done
     )
     goto done
@@ -460,9 +460,9 @@ set "OPTION="
         set "WORK_DIR=!FIELD_D!"
     )
     if ""=="!FIELD_F!" (
-        set "KUBE_CONFIG_FILE=!WORK_DIR!\%DEFAULT_KUBE_CONFIG_FILE%"
+        set "KUBECONFIG_FILE=!WORK_DIR!\%DEFAULT_KUBECONFIG_FILE%"
     ) else (
-        set "KUBE_CONFIG_FILE=!FIELD_F!"
+        set "KUBECONFIG_FILE=!FIELD_F!"
     )
     if ""=="!FIELD_T!" (
         set "TARGET_REGISTRY_ENDPOINT=%DEFAULT_TARGET_REGISTRY_ENDPOINT%"
@@ -478,7 +478,7 @@ set "OPTION="
     call :info "  Kubernetes:"
     call :info "    Cluster:"
     call :info "      Name: !CLUSTER_NAME!"
-    call :info "      File: !KUBE_CONFIG_FILE!"
+    call :info "      File: !KUBECONFIG_FILE!"
     call :info "    Credential:"
     call :info "      Name: !CRED_NAME!"
 
@@ -493,19 +493,19 @@ set "OPTION="
     if "1"=="!COMMAND_D!" goto ncrcred_delete
     :ncrcred_list
         call :info "List NCR Credentials:"
-        call kubectl --kubeconfig !KUBE_CONFIG_FILE! get secrets
+        call kubectl --kubeconfig !KUBECONFIG_FILE! get secrets
         goto done
     :ncrcred_show
         call :info "Show NCR Credential:"
-        call kubectl --kubeconfig !KUBE_CONFIG_FILE! get secret !CRED_NAME!
+        call kubectl --kubeconfig !KUBECONFIG_FILE! get secret !CRED_NAME!
         goto done
     :ncrcred_update
         call :info "Update NCR Credential:"
-        call kubectl --kubeconfig !KUBE_CONFIG_FILE! create secret docker-registry !CRED_NAME! --docker-server=!TARGET_REGISTRY_ENDPOINT! --docker-username=!CRED_USERNAME! --docker-password=!CRED_PASSWORD! --docker-email=!CRED_EMAIL!
+        call kubectl --kubeconfig !KUBECONFIG_FILE! create secret docker-registry !CRED_NAME! --docker-server=!TARGET_REGISTRY_ENDPOINT! --docker-username=!CRED_USERNAME! --docker-password=!CRED_PASSWORD! --docker-email=!CRED_EMAIL!
         goto ncrcred_list
     :ncrcred_delete
         call :info "Delete NCR Credential:"
-        call kubectl --kubeconfig !KUBE_CONFIG_FILE! delete secret !CRED_NAME!
+        call kubectl --kubeconfig !KUBECONFIG_FILE! delete secret !CRED_NAME!
         goto ncrcred_list
     goto fail
 
@@ -533,14 +533,14 @@ set "OPTION="
         set "WORK_DIR=!FIELD_D!"
     )
     if ""=="!FIELD_F!" (
-        set "KUBE_CONFIG_FILE=!WORK_DIR!\%DEFAULT_KUBE_CONFIG_FILE%"
+        set "KUBECONFIG_FILE=!WORK_DIR!\%DEFAULT_KUBECONFIG_FILE%"
     ) else (
-        set "KUBE_CONFIG_FILE=!FIELD_F!"
+        set "KUBECONFIG_FILE=!FIELD_F!"
     )
     if ""=="!FIELD_K!" (
-        set "KUBE_KUSTOMIZATION_FILE=!WORK_DIR!\!APP_NAME!\%DEFAULT_KUBE_KUSTOMIZATION_FILE%"
+        set "KUSTOMIZATION_FILE=!WORK_DIR!\!APP_NAME!\%DEFAULT_KUSTOMIZATION_FILE%"
     ) else (
-        set "KUBE_KUSTOMIZATION_FILE=!FIELD_K!"
+        set "KUSTOMIZATION_FILE=!FIELD_K!"
     )
     call :info "  Registry:"
     call :info "    Origin:"
@@ -552,9 +552,9 @@ set "OPTION="
     call :info "  Kubernetes:"
     call :info "    Cluster:"
     call :info "      Name: !CLUSTER_NAME!"
-    call :info "      File: !KUBE_CONFIG_FILE!"
+    call :info "      File: !KUBECONFIG_FILE!"
     call :info "    Kustomize:"
-    call :info "      File: !KUBE_KUSTOMIZATION_FILE!"
+    call :info "      File: !KUSTOMIZATION_FILE!"
 
 :ncp_tasks
     if ""=="!CLUSTER_NAME!" (
@@ -605,7 +605,7 @@ set "OPTION="
             call :error "Failed to edit '!TARGET_IMAGE!'"
             goto done
         )
-        call kubectl kustomize ./ | kubectl --kubeconfig !KUBE_CONFIG_FILE! apply -f -
+        call kubectl kustomize ./ | kubectl --kubeconfig !KUBECONFIG_FILE! apply -f -
         if errorlevel 1 (
             call :error "Failed to apply '!TARGET_IMAGE!'"
             goto done
@@ -701,7 +701,7 @@ goto end
     echo                                        Ncloud API URL []: https://ncloud.apigw.ntruss.com
     echo                      -c [name]       Cluster Name
     echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%)
-    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBE_CONFIG_FILE%%NOCOLOR%)
+    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -r [region]     Region (DEFAULT: %SKY%%DEFAULT_NKS_REGION%%NOCOLOR%)
     echo                                      Regions: %SKY%KR, SGN, JPN%NOCOLOR%
     echo                      -u [uuid]       Cluster Uuid
@@ -711,27 +711,27 @@ goto end
     echo                    Required Fields:
     echo                      -c [name]       Cluster Name
     echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
-    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBE_CONFIG_FILE%%NOCOLOR%)
+    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                -W  Update Credential
     echo                    Required Fields:
     echo                      -c [name]       Cluster Name
     echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
-    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBE_CONFIG_FILE%%NOCOLOR%)
+    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -n [name]       Credential Name
     echo                -R  Show Credential
     echo                    Required Fields:
     echo                      -c [name]       Cluster Name
     echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
-    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBE_CONFIG_FILE%%NOCOLOR%)
+    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -n [name]       Credential Name
     echo                -D  Delete Credential
     echo                    Required Fields:
     echo                      -c [name]       Cluster Name
     echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
-    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBE_CONFIG_FILE%%NOCOLOR%)
+    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -n [name]       Credential Name
     echo     ncp      Naver Cloud Platform Tasks
@@ -750,9 +750,9 @@ goto end
     echo                      -v [version]    Application Version
     echo                      -c [name]       Cluster Name
     echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
-    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBE_CONFIG_FILE%%NOCOLOR%)
+    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
-    echo                      -k [file]       Kustomization File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_KUBE_KUSTOMIZATION_FILE%%NOCOLOR%)
+    echo                      -k [file]       Kustomization File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_KUSTOMIZATION_FILE%%NOCOLOR%)
     echo                    Compatible Commands:
     echo                      -MA
     echo                -D  Delete Deployment and Service
@@ -761,9 +761,9 @@ goto end
     echo                      -v [version]    Application Version
     echo                      -c [name]       Cluster Name
     echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
-    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBE_CONFIG_FILE%%NOCOLOR%)
+    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
-    echo                      -k [file]       Kustomization File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_KUBE_KUSTOMIZATION_FILE%%NOCOLOR%)
+    echo                      -k [file]       Kustomization File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_KUSTOMIZATION_FILE%%NOCOLOR%)
     echo                    Compatible Commands:
     echo                      -MA
     echo.
