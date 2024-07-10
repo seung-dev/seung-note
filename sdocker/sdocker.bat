@@ -512,15 +512,39 @@ set "OPTION="
 :ncp_job
 
 :ncp_fields
-    if ""=="!FIELD_O!" (
-        set "ORIGIN_REGISTRY_ENDPOINT=%DEFAULT_ORIGIN_REGISTRY_ENDPOINT%"
-    ) else (
-        set "ORIGIN_REGISTRY_ENDPOINT=!FIELD_T!"
+    if "1"=="!COMMAND_M!" (
+        if ""=="!FIELD_O!" (
+            set "ORIGIN_REGISTRY_ENDPOINT=%DEFAULT_ORIGIN_REGISTRY_ENDPOINT%"
+        ) else (
+            set "ORIGIN_REGISTRY_ENDPOINT=!FIELD_O!"
+        )
+        if ""=="!ORIGIN_REGISTRY_ENDPOINT!" (
+            set "ORIGIN_IMAGE=!APP_NAME!:!APP_VERSION!"
+        ) else (
+            set "ORIGIN_IMAGE=!ORIGIN_REGISTRY_ENDPOINT!/!APP_NAME!:!APP_VERSION!"
+        )
+        if ""=="!FIELD_T!" (
+            set "TARGET_REGISTRY_ENDPOINT=%DEFAULT_NCR_PUBLIC_ENDPOINT%"
+        ) else (
+            set "TARGET_REGISTRY_ENDPOINT=!FIELD_T!"
+        )
+        if ""=="!TARGET_REGISTRY_ENDPOINT!" (
+            set "TARGET_IMAGE=!APP_NAME!:!APP_VERSION!"
+        ) else (
+            set "TARGET_IMAGE=!TARGET_REGISTRY_ENDPOINT!/!APP_NAME!:!APP_VERSION!"
+        )
     )
-    if ""=="!FIELD_T!" (
-        set "TARGET_REGISTRY_ENDPOINT=%DEFAULT_TARGET_REGISTRY_ENDPOINT%"
-    ) else (
-        set "TARGET_REGISTRY_ENDPOINT=!FIELD_T!"
+    if "1"=="!COMMAND_A!" (
+        if ""=="!FIELD_T!" (
+            set "ORIGIN_REGISTRY_ENDPOINT=%DEFAULT_NCR_PRIVATE_ENDPOINT%"
+        ) else (
+            set "ORIGIN_REGISTRY_ENDPOINT=!FIELD_T!"
+        )
+        if ""=="!ORIGIN_REGISTRY_ENDPOINT!" (
+            set "ORIGIN_IMAGE=!APP_NAME!:!APP_VERSION!"
+        ) else (
+            set "ORIGIN_IMAGE=!ORIGIN_REGISTRY_ENDPOINT!/!APP_NAME!:!APP_VERSION!"
+        )
     )
     if ""=="!FIELD_C!" (
         set "CLUSTER_NAME=%DEFAULT_CLUSTER_NAME%"
@@ -673,23 +697,28 @@ goto end
     echo                      -v [version]    Application Version
     echo                      -o [endpoint]   Origin Registry Endpoint (DEFAULT: %SKY%%DEFAULT_ORIGIN_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
+    echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo     wincred  Windows Docker Credential Tasks
     echo              Commands:
     echo                -L  List Credentials
     echo                    Required Fields:
     echo                      -x [file]       Docker Wincred File (DEFAULT: %SKY%%DEFAULT_DOCKER_WINCRED_EXE%%NOCOLOR%)
+    echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo                -W  Update Credential
     echo                    Required Fields:
     echo                      -x [file]       Docker Wincred File (DEFAULT: %SKY%%DEFAULT_DOCKER_WINCRED_EXE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
+    echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo                -R  Show Credential
     echo                    Required Fields:
     echo                      -x [file]       Docker Wincred File (DEFAULT: %SKY%%DEFAULT_DOCKER_WINCRED_EXE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
+    echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo                -D  Delete Credential
     echo                    Required Fields:
     echo                      -x [file]       Docker Wincred File (DEFAULT: %SKY%%DEFAULT_DOCKER_WINCRED_EXE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
+    echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo     nkscred  NKS Credential Tasks
     echo              Commands:
     echo                -W  Update Credential
@@ -705,6 +734,7 @@ goto end
     echo                      -r [region]     Region (DEFAULT: %SKY%%DEFAULT_NKS_REGION%%NOCOLOR%)
     echo                                      Regions: %SKY%KR, SGN, JPN%NOCOLOR%
     echo                      -u [uuid]       Cluster Uuid
+    echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo     ncrcred  NCR Credential Tasks
     echo              Commands:
     echo                -L  List Credentials
@@ -713,6 +743,7 @@ goto end
     echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
     echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
+    echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo                -W  Update Credential
     echo                    Required Fields:
     echo                      -c [name]       Cluster Name
@@ -720,6 +751,7 @@ goto end
     echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -n [name]       Credential Name
+    echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo                -R  Show Credential
     echo                    Required Fields:
     echo                      -c [name]       Cluster Name
@@ -727,6 +759,7 @@ goto end
     echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -n [name]       Credential Name
+    echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo                -D  Delete Credential
     echo                    Required Fields:
     echo                      -c [name]       Cluster Name
@@ -734,15 +767,15 @@ goto end
     echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -n [name]       Credential Name
+    echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo     ncp      Naver Cloud Platform Tasks
     echo                -M  Move Docker Image to NCR
     echo                    Required Fields:
     echo                      -n [name]       Application Name
     echo                      -v [version]    Application Version
     echo                      -o [endpoint]   Origin Registry Endpoint (DEFAULT: %SKY%%DEFAULT_ORIGIN_REGISTRY_ENDPOINT%%NOCOLOR%)
-    echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
-    echo                    Compatible Commands:
-    echo                      -MA
+    echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_NCR_PUBLIC_ENDPOINT%%NOCOLOR%)
+    echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo                -L  List Kubernetes Resources
     echo                -A  Apply Docker Image to NKS
     echo                    Required Fields:
@@ -751,10 +784,9 @@ goto end
     echo                      -c [name]       Cluster Name
     echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
     echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
-    echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
+    echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_NCR_PRIVATE_ENDPOINT%%NOCOLOR%)
     echo                      -k [file]       Kustomization File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_KUSTOMIZATION_FILE%%NOCOLOR%)
-    echo                    Compatible Commands:
-    echo                      -MA
+    echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo                -D  Delete Deployment and Service
     echo                    Required Fields:
     echo                      -n [name]       Application Name
@@ -764,8 +796,7 @@ goto end
     echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -k [file]       Kustomization File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_KUSTOMIZATION_FILE%%NOCOLOR%)
-    echo                    Compatible Commands:
-    echo                      -MA
+    echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo.
     goto end
 
