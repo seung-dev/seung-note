@@ -644,9 +644,9 @@ set "OPTION="
     call :elapsed
     if ""=="!EXIT_CODE!" set "EXIT_CODE=!ERRORLEVEL!"
     if 0==!EXIT_CODE! (
-        call :info "%GREEN%Success%NOCOLOR% in %YELLOW%!DIFF_HH!:!DIFF_MM!:!DIFF_SS!.!DIFF_MS:~0,3!%NOCOLOR%"
+        call :info "%GREEN%Success%NOCOLOR% in %GREEN%!DIFF_HH!:!DIFF_MM!:!DIFF_SS!.!DIFF_MS:~0,3!%NOCOLOR%"
     ) else (
-        call :error "%RED%Fail%NOCOLOR% in %YELLOW%!DIFF_HH!:!DIFF_MM!:!DIFF_SS!.!DIFF_MS:~0,3!%NOCOLOR%"
+        call :error "%RED%Fail%NOCOLOR% in %GREEN%!DIFF_HH!:!DIFF_MM!:!DIFF_SS!.!DIFF_MS:~0,3!%NOCOLOR%"
     )
 
 goto end
@@ -661,7 +661,7 @@ goto end
     echo                    Required Fields:
     echo                      -n [name]       Application Name
     echo                      -v [version]    Application Version
-    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
+    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Application Name]%NOCOLOR%)
     echo                      -b [tool]       Build Tool
     echo                                      Tools: %SKY%gradle, npm%NOCOLOR%
     echo                    Compatible Commands:
@@ -671,9 +671,9 @@ goto end
     echo                    Required Fields:
     echo                      -n [name]       Application Name
     echo                      -v [version]    Application Version
-    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
+    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Application Name]%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
-    echo                      -f [file]       Docker Compose File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_DOCKER_COMPOSE_FILE%%NOCOLOR%)
+    echo                      -f [file]       Docker Compose File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_DOCKER_COMPOSE_FILE%%NOCOLOR%)
     echo                    Compatible Commands:
     echo                      -BI
     echo                      -BIP
@@ -681,9 +681,9 @@ goto end
     echo                    Required Fields:
     echo                      -n [name]       Application Name
     echo                      -v [version]    Application Version
-    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
+    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Application Name]%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
-    echo                      -f [file]       Docker Compose File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_DOCKER_COMPOSE_FILE%%NOCOLOR%)
+    echo                      -f [file]       Docker Compose File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_DOCKER_COMPOSE_FILE%%NOCOLOR%)
     echo                    Compatible Commands:
     echo                      -BR
     echo                -P  Push Docker Image
@@ -731,8 +731,8 @@ goto end
     echo                                        Ncloud Secret Access Key []:
     echo                                        Ncloud API URL []: https://ncloud.apigw.ntruss.com
     echo                      -c [name]       Cluster Name
-    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%)
-    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
+    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%)
+    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -r [region]     Region (DEFAULT: %SKY%%DEFAULT_NKS_REGION%%NOCOLOR%)
     echo                                      Regions: %SKY%KR, SGN, JPN%NOCOLOR%
     echo                      -u [uuid]       Cluster Uuid
@@ -742,31 +742,31 @@ goto end
     echo                -L  List Credentials
     echo                    Required Fields:
     echo                      -c [name]       Cluster Name
-    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
-    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
+    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%)
+    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo                -W  Update Credential
     echo                    Required Fields:
     echo                      -c [name]       Cluster Name
-    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
-    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
+    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%)
+    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -n [name]       Credential Name
     echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo                -R  Show Credential
     echo                    Required Fields:
     echo                      -c [name]       Cluster Name
-    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
-    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
+    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%)
+    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -n [name]       Credential Name
     echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo                -D  Delete Credential
     echo                    Required Fields:
     echo                      -c [name]       Cluster Name
-    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
-    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
+    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%)
+    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -n [name]       Credential Name
     echo                    Compatible Commands: %RED%None%NOCOLOR%
@@ -779,26 +779,18 @@ goto end
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_NCR_PUBLIC_ENDPOINT%%NOCOLOR%)
     echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo                -L  List Kubernetes Resources
+    echo                    %YELLOW%Under Construction%NOCOLOR%
     echo                -A  Apply Docker Image to NKS
     echo                    Required Fields:
     echo                      -n [name]       Application Name
     echo                      -v [version]    Application Version
     echo                      -c [name]       Cluster Name
-    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
-    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
+    echo                      -d [directory]  Work Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%)
+    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%GREEN%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_NCR_PRIVATE_ENDPOINT%%NOCOLOR%)
-    echo                      -k [file]       Kustomize Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_KUSTOMIZATION_FILE%%NOCOLOR%)
     echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo                -D  Delete Deployment and Service
-    echo                    Required Fields:
-    echo                      -n [name]       Application Name
-    echo                      -v [version]    Application Version
-    echo                      -c [name]       Cluster Name
-    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
-    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
-    echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
-    echo                      -k [file]       Kustomization File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_KUSTOMIZATION_FILE%%NOCOLOR%)
-    echo                    Compatible Commands: %RED%None%NOCOLOR%
+    echo                    %YELLOW%Under Construction%NOCOLOR%
     echo.
     goto end
 
@@ -829,7 +821,7 @@ goto end
     exit /b
 
 :warn
-    echo [%date% %time%] [%YELLOW% WARN%NOCOLOR%] %~1
+    echo [%date% %time%] [%GREEN% WARN%NOCOLOR%] %~1
     exit /b
 
 :error
