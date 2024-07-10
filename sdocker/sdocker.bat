@@ -75,7 +75,6 @@ set "OPTION="
             for %%a in (A I R P L) do (
                 if "%%a"=="!COMMAND!" (
                     set "COMMAND_!COMMAND!=1"
-                    echo set "COMMAND_!COMMAND!=1"
                     set "COMMANDS=!COMMANDS:~1!"
                     goto split
                 )
@@ -85,7 +84,6 @@ set "OPTION="
             for %%a in (L W R D) do (
                 if "%%a"=="!COMMAND!" (
                     set "COMMAND_!COMMAND!=1"
-                    echo set "COMMAND_!COMMAND!=1"
                     set "COMMANDS=!COMMANDS:~1!"
                     goto split
                 )
@@ -95,7 +93,6 @@ set "OPTION="
             for %%a in (W) do (
                 if "%%a"=="!COMMAND!" (
                     set "COMMAND_!COMMAND!=1"
-                    echo set "COMMAND_!COMMAND!=1"
                     set "COMMANDS=!COMMANDS:~1!"
                     goto split
                 )
@@ -105,7 +102,6 @@ set "OPTION="
             for %%a in (L W R D) do (
                 if "%%a"=="!COMMAND!" (
                     set "COMMAND_!COMMAND!=1"
-                    echo set "COMMAND_!COMMAND!=1"
                     set "COMMANDS=!COMMANDS:~1!"
                     goto split
                 )
@@ -115,7 +111,6 @@ set "OPTION="
             for %%a in (M A) do (
                 if "%%a"=="!COMMAND!" (
                     set "COMMAND_!COMMAND!=1"
-                    echo set "COMMAND_!COMMAND!=1"
                     set "COMMANDS=!COMMANDS:~1!"
                     goto split
                 )
@@ -140,7 +135,6 @@ set "OPTION="
         if /i "%%a"=="!FIELD!" (
             if not "-"=="!ARG2:~0,1!" (
                 set "FIELD_%%a=!ARG2!"
-                echo set "FIELD_%%a=!ARG2!"
                 shift
             )
             shift
@@ -349,6 +343,8 @@ set "OPTION="
     ) else (
         set "TARGET_REGISTRY_ENDPOINT=!FIELD_T!"
     )
+    call :info "Option: !OPTION!"
+    call :info "Fields:"
     call :info "  File: !EXE_FILE!"
     call :info "  Registry:"
     call :info "    Target:"
@@ -410,6 +406,8 @@ set "OPTION="
     ) else (
         set "NKS_UUID=!FIELD_U!"
     )
+    call :info "Option: !OPTION!"
+    call :info "Fields:"
     call :info "  File: !EXE_FILE!"
     call :info "  Kubernetes:"
     call :info "    Cluster:"
@@ -472,6 +470,8 @@ set "OPTION="
     if ""=="!FIELD_N!" (
         set "CRED_NAME=!FIELD_N!"
     )
+    call :info "Option: !OPTION!"
+    call :info "Fields:"
     call :info "  Registry:"
     call :info "    Target:"
     call :info "      Endpoint: !TARGET_REGISTRY_ENDPOINT!"
@@ -536,14 +536,14 @@ set "OPTION="
     )
     if "1"=="!COMMAND_A!" (
         if ""=="!FIELD_T!" (
-            set "ORIGIN_REGISTRY_ENDPOINT=%DEFAULT_NCR_PRIVATE_ENDPOINT%"
+            set "TARGET_REGISTRY_ENDPOINT=%DEFAULT_NCR_PRIVATE_ENDPOINT%"
         ) else (
-            set "ORIGIN_REGISTRY_ENDPOINT=!FIELD_T!"
+            set "TARGET_REGISTRY_ENDPOINT=!FIELD_T!"
         )
-        if ""=="!ORIGIN_REGISTRY_ENDPOINT!" (
-            set "ORIGIN_IMAGE=!APP_NAME!:!APP_VERSION!"
+        if ""=="!TARGET_REGISTRY_ENDPOINT!" (
+            set "TARGET_IMAGE=!APP_NAME!:!APP_VERSION!"
         ) else (
-            set "ORIGIN_IMAGE=!ORIGIN_REGISTRY_ENDPOINT!/!APP_NAME!:!APP_VERSION!"
+            set "TARGET_IMAGE=!TARGET_REGISTRY_ENDPOINT!/!APP_NAME!:!APP_VERSION!"
         )
     )
     if ""=="!FIELD_C!" (
@@ -562,10 +562,12 @@ set "OPTION="
         set "KUBECONFIG_FILE=!FIELD_F!"
     )
     if ""=="!FIELD_K!" (
-        set "KUSTOMIZATION_FILE=!WORK_DIR!\!APP_NAME!\%DEFAULT_KUSTOMIZATION_FILE%"
+        set "KUSTOMIZE_DIR=!WORK_DIR!\!APP_NAME!"
     ) else (
-        set "KUSTOMIZATION_FILE=!FIELD_K!"
+        set "KUSTOMIZE_DIR=!FIELD_K!"
     )
+    call :info "Option: !OPTION!"
+    call :info "Fields:"
     call :info "  Registry:"
     call :info "    Origin:"
     call :info "      Endpoint: !ORIGIN_REGISTRY_ENDPOINT!"
@@ -578,7 +580,7 @@ set "OPTION="
     call :info "      Name: !CLUSTER_NAME!"
     call :info "      File: !KUBECONFIG_FILE!"
     call :info "    Kustomize:"
-    call :info "      File: !KUSTOMIZATION_FILE!"
+    call :info "      Directory: !KUSTOMIZE_DIR!"
 
 :ncp_tasks
     if ""=="!CLUSTER_NAME!" (
@@ -618,9 +620,9 @@ set "OPTION="
         )
     )
     if "1"=="!COMMAND_A!" (
-        cd /d "!WORK_DIR!" >nul 2>&1
+        cd /d "!KUSTOMIZE_DIR!" >nul 2>&1
         if errorlevel 1 (
-            call :error "'!WORK_DIR!' does not exist"
+            call :error "'!KUSTOMIZE_DIR!' does not exist"
             goto done
         )
         call :info "Apply Docker Image:"
@@ -659,7 +661,7 @@ goto end
     echo                    Required Fields:
     echo                      -n [name]       Application Name
     echo                      -v [version]    Application Version
-    echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
+    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
     echo                      -b [tool]       Build Tool
     echo                                      Tools: %SKY%gradle, npm%NOCOLOR%
     echo                    Compatible Commands:
@@ -669,7 +671,7 @@ goto end
     echo                    Required Fields:
     echo                      -n [name]       Application Name
     echo                      -v [version]    Application Version
-    echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
+    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -f [file]       Docker Compose File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_DOCKER_COMPOSE_FILE%%NOCOLOR%)
     echo                    Compatible Commands:
@@ -679,7 +681,7 @@ goto end
     echo                    Required Fields:
     echo                      -n [name]       Application Name
     echo                      -v [version]    Application Version
-    echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
+    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -f [file]       Docker Compose File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_DOCKER_COMPOSE_FILE%%NOCOLOR%)
     echo                    Compatible Commands:
@@ -729,7 +731,7 @@ goto end
     echo                                        Ncloud Secret Access Key []:
     echo                                        Ncloud API URL []: https://ncloud.apigw.ntruss.com
     echo                      -c [name]       Cluster Name
-    echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%)
+    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%)
     echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -r [region]     Region (DEFAULT: %SKY%%DEFAULT_NKS_REGION%%NOCOLOR%)
     echo                                      Regions: %SKY%KR, SGN, JPN%NOCOLOR%
@@ -740,14 +742,14 @@ goto end
     echo                -L  List Credentials
     echo                    Required Fields:
     echo                      -c [name]       Cluster Name
-    echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
+    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
     echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo                -W  Update Credential
     echo                    Required Fields:
     echo                      -c [name]       Cluster Name
-    echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
+    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
     echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -n [name]       Credential Name
@@ -755,7 +757,7 @@ goto end
     echo                -R  Show Credential
     echo                    Required Fields:
     echo                      -c [name]       Cluster Name
-    echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
+    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
     echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -n [name]       Credential Name
@@ -763,7 +765,7 @@ goto end
     echo                -D  Delete Credential
     echo                    Required Fields:
     echo                      -c [name]       Cluster Name
-    echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
+    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
     echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -n [name]       Credential Name
@@ -782,17 +784,17 @@ goto end
     echo                      -n [name]       Application Name
     echo                      -v [version]    Application Version
     echo                      -c [name]       Cluster Name
-    echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
+    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
     echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_NCR_PRIVATE_ENDPOINT%%NOCOLOR%)
-    echo                      -k [file]       Kustomization File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_KUSTOMIZATION_FILE%%NOCOLOR%)
+    echo                      -k [file]       Kustomize Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_KUSTOMIZATION_FILE%%NOCOLOR%)
     echo                    Compatible Commands: %RED%None%NOCOLOR%
     echo                -D  Delete Deployment and Service
     echo                    Required Fields:
     echo                      -n [name]       Application Name
     echo                      -v [version]    Application Version
     echo                      -c [name]       Cluster Name
-    echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
+    echo                      -d [directory]  Working Directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
     echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBECONFIG_FILE%%NOCOLOR%)
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -k [file]       Kustomization File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_KUSTOMIZATION_FILE%%NOCOLOR%)
@@ -874,8 +876,8 @@ goto end
     goto end
 
 :end
-    endlocal
-    if not "!OPTION!"=="!OPTION:cred=!" (
+    if not ""=="!OPTION!" if not "!OPTION!"=="!OPTION:cred=!" (
         call cmd /k
     )
+    endlocal
     exit /b !EXIT_CODE!
