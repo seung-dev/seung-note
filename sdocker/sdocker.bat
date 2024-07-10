@@ -9,15 +9,15 @@
 
 @echo off
 
-@rem set /p password=<%~nx0:password
-@rem PROMPT $G
-
-
 setlocal enabledelayedexpansion
 
 @rem Version
 set "SDOCKER_VERSION=1.0.0"
 set "SDOCKER_RELEASE_DATE=2024-07-09"
+set "SDOCKER_DIR=%~dp0"
+for %%a in (%0) do (
+    set "SDOCKER_FILE=%%~na"
+)
 
 @rem Fields
 set "EXIT_CODE="
@@ -26,6 +26,13 @@ set "OPTION="
 :init
     call :colors
     call :import_ini
+    if not ""=="%DEFAULT_CHARSET%" (
+        call chcp %DEFAULT_CHARSET% >nul 2>&1
+        if errorlevel 1 (
+            echo sdocker: Invalid code page
+            goto try
+        )
+    )
 
 @rem Parse Options
 :parse_option
@@ -189,14 +196,13 @@ set "OPTION="
 
 :begin
     call :begin_at
+    if "image"=="!OPTION!" goto image_job
+    if "wincred"=="!OPTION!" goto wincred_job
+    if "nkscred"=="!OPTION!" goto nkscred_job
+    if "ncrcred"=="!OPTION!" goto ncrcred_job
+    if "ncp"=="!OPTION!" goto ncp_job
 
-:fields
-    call :info "Option: !OPTION!"
-    call :info "Fields:"
-    if "wincred"=="!OPTION!" goto wincred_fields
-    if "nkscred"=="!OPTION!" goto nkscred_fields
-    if "ncrcred"=="!OPTION!" goto ncrcred_fields
-    if "ncp"=="!OPTION!" goto ncp_fields
+:image_job
 
 :image_fields
     set "APP_NAME=!FIELD_N!"
@@ -237,6 +243,8 @@ set "OPTION="
     ) else (
         set "DOCKER_COMPOSE_FILE=!FIELD_F!"
     )
+    call :info "Option: !OPTION!"
+    call :info "Fields:"
     call :info "  Application:"
     call :info "    Name: !APP_NAME!"
     call :info "    Version: !APP_VERSION!"
@@ -253,7 +261,82 @@ set "OPTION="
     call :info "  Docker:"
     call :info "    Compose:"
     call :info "      File: !DOCKER_COMPOSE_FILE!"
-    goto tasks
+
+:image_tasks
+    if "1"=="!COMMAND_A!" (
+        if ""=="!BUILD_TOOL!" (
+            call :error "Build tool is required"
+            goto fail
+        )
+        cd /d "!WORK_DIR!" >nul 2>&1
+        if errorlevel 1 (
+            call :error "'!WORK_DIR!' does not exist"
+            goto done
+        )
+        if "gradle"=="!BUILD_TOOL!" (
+            call :info "Build with Gradle:"
+            call gradlew.bat clean build --refresh-dependencies -Pver=!APP_VERSION!
+        )
+        if "npm"=="!BUILD_TOOL!" (
+            call :info "Build with NPM:"
+            call npm run build
+        )
+        if errorlevel 1 (
+            call :error "Failed to build with !BUILD_TOOL!"
+            goto done
+        )
+    )
+    if "1"=="!COMMAND_I!" (
+        cd /d "!WORK_DIR!" >nul 2>&1
+        if errorlevel 1 (
+            call :error "'!WORK_DIR!' does not exist"
+            goto done
+        )
+        call :info "Build Docker Image:"
+        call docker compose -f !DOCKER_COMPOSE_FILE! build --no-cache
+        if errorlevel 1 (
+            call :error "Failed to build '!TARGET_IMAGE!'"
+            goto done
+        )
+        call docker image prune -f
+        if errorlevel 1 (
+            call :error "Failed to prune images"
+            goto done
+        )
+    )
+    :image_skip_directory
+    if "1"=="!COMMAND_R!" (
+        call :info "Run Docker Image:"
+        call docker compose -f !DOCKER_COMPOSE_FILE! up -d
+        if errorlevel 1 (
+            call :error "Failed to run '!TARGET_IMAGE!'"
+            goto done
+        )
+        call docker image prune -f
+        if errorlevel 1 (
+            call :error "Failed to prune images"
+            goto done
+        )
+    )
+    if "1"=="!COMMAND_P!" (
+        call :info "Push Docker Image:"
+        call docker image push !TARGET_IMAGE!
+        if errorlevel 1 (
+            call :error "Failed to push '!TARGET_IMAGE!'"
+            goto done
+        )
+    )
+    if "1"=="!COMMAND_L!" (
+        call :info "Pull Docker Image:"
+        call docker image pull !ORIGIN_IMAGE!
+        if errorlevel 1 (
+            call :error "Failed to pull '!ORIGIN_IMAGE!'"
+            goto done
+        )
+    )
+    goto done
+
+:wincred_job
 
 :wincred_fields
     if ""=="!FIELD_X!" (
@@ -270,7 +353,31 @@ set "OPTION="
     call :info "  Registry:"
     call :info "    Target:"
     call :info "      Endpoint: !TARGET_REGISTRY_ENDPOINT!"
-    goto tasks
+
+:wincred_tasks
+    if "1"=="!COMMAND_L!" goto wincred_list
+    if "1"=="!COMMAND_R!" goto wincred_show
+    if "1"=="!COMMAND_W!" goto wincred_update
+    if "1"=="!COMMAND_D!" goto wincred_delete
+    :wincred_list
+        call :info "List Docker Registry Credentials:"
+        call !EXE_FILE! list
+        goto done
+    :wincred_show
+        call :info "Show Docker Registry Credential:"
+        call echo !TARGET_REGISTRY_ENDPOINT! | !EXE_FILE! get
+        goto done
+    :wincred_update
+        call :info "Update Docker Registry Credential:"
+        call echo {"ServerURL":"!TARGET_REGISTRY_ENDPOINT!","Username":"!CRED_USERNAME!","Secret":"!CRED_PASSWORD!"} | !EXE_FILE! store
+        goto wincred_list
+    :wincred_delete
+        call :info "Delete Docker Registry Credential:"
+        call echo !TARGET_REGISTRY_ENDPOINT! | !EXE_FILE! erase
+        goto wincred_list
+    goto fail
+
+:nkscred_job
 
 :nkscred_fields
     if ""=="!FIELD_X!" (
@@ -310,7 +417,36 @@ set "OPTION="
     call :info "      File: !KUBE_CONFIG_FILE!"
     call :info "      Region: !NKS_REGION!"
     call :info "      UUID: !NKS_UUID!"
-    goto tasks
+
+:nkscred_tasks
+    if ""=="!CLUSTER_NAME!" (
+        call :error "Cluster name is required"
+        goto fail
+    )
+    if ""=="!NKS_UUID!" (
+        call :error "Cluster UUID is required"
+        goto fail
+    )
+    call :info "Update NCR Credential:"
+    set "NCP_CONFIGURE=%UserProfile%\.ncloud\configure"
+    if exist !NCP_CONFIGURE! (
+        call del !NCP_CONFIGURE!
+        if errorlevel 1 (
+            call :error "Failed to delete '!NCP_CONFIGURE!'"
+            goto done
+        )
+    )
+    call echo ncloud_access_key_id     = !CRED_USERNAME!> !NCP_CONFIGURE!
+    call echo ncloud_secret_access_key = !CRED_PASSWORD!>> !NCP_CONFIGURE!
+    call echo ncloud_api_url           = https://ncloud.apigw.ntruss.com>> !NCP_CONFIGURE!
+    call !EXE_FILE! create-kubeconfig --output !KUBE_CONFIG_FILE! --region !NKS_REGION! --clusterName !CLUSTER_NAME! --clusterUuid !NKS_UUID!
+    if errorlevel 1 (
+        call :error "Failed to update '!KUBE_CONFIG_FILE!'"
+        goto done
+    )
+    goto done
+
+:ncrcred_job
 
 :ncrcred_fields
     if ""=="!FIELD_C!" (
@@ -345,129 +481,13 @@ set "OPTION="
     call :info "      File: !KUBE_CONFIG_FILE!"
     call :info "    Credential:"
     call :info "      Name: !CRED_NAME!"
-    goto tasks
-
-:tasks
-    if "wincred"=="!OPTION!" goto wincred_tasks
-    if "nkscred"=="!OPTION!" goto nkscred_tasks
-    if "ncrcred"=="!OPTION!" goto ncrcred_tasks
-    if "ncp"=="!OPTION!" goto ncp_tasks
-
-:image_tasks
-    if "1"=="!COMMAND_A!" (
-        if ""=="!BUILD_TOOL!" (
-            call :error "Build tool is required"
-            goto try
-        )
-        cd /d "!WORK_DIR!" >nul 2>&1
-        if errorlevel 1 (
-            call :error "'!WORK_DIR!' does not exist"
-            goto done
-        )
-        if "gradle"=="!BUILD_TOOL!" (
-            call :info "Build with Gradle:"
-            call gradlew.bat clean build --refresh-dependencies -Pver=!APP_VERSION!
-        )
-        if "npm"=="!BUILD_TOOL!" (
-            call :info "Build with NPM:"
-            call npm run build
-        )
-        if errorlevel 1 (
-            call :error "Failed to build with !BUILD_TOOL!"
-            goto done
-        )
-    )
-    if "1"=="!COMMAND_I!" (
-        cd /d "!WORK_DIR!" >nul 2>&1
-        if errorlevel 1 (
-            call :error "'!WORK_DIR!' does not exist"
-            goto done
-        )
-        call :info "Build Docker Image:"
-        call docker compose -f !DOCKER_COMPOSE_FILE! build --no-cache
-        if errorlevel 1 (
-            call :error "Failed to build '!TARGET_IMAGE!'"
-            goto done
-        )
-    )
-    :image_skip_directory
-    if "1"=="!COMMAND_R!" (
-        call :info "Run Docker Image:"
-        call docker compose -f !DOCKER_COMPOSE_FILE! up -d
-        if errorlevel 1 (
-            call :error "Failed to run '!TARGET_IMAGE!'"
-            goto done
-        )
-    )
-    if "1"=="!COMMAND_P!" (
-        call :info "Push Docker Image:"
-        call docker image push !TARGET_IMAGE!
-        if errorlevel 1 (
-            call :error "Failed to push '!TARGET_IMAGE!'"
-            goto done
-        )
-    )
-    if "1"=="!COMMAND_L!" (
-        call :info "Pull Docker Image:"
-        call docker image pull !ORIGIN_IMAGE!
-        if errorlevel 1 (
-            call :error "Failed to pull '!ORIGIN_IMAGE!'"
-            goto done
-        )
-    )
-    goto done
-
-:wincred_tasks
-    if "1"=="!COMMAND_R!" goto wincred_show
-    if "1"=="!COMMAND_W!" goto wincred_update
-    if "1"=="!COMMAND_D!" goto wincred_delete
-    :wincred_list
-        call :info "List Docker Registry Credentials:"
-        call !EXE_FILE! list
-        goto done
-    :wincred_show
-        call :info "Show Docker Registry Credential:"
-        call echo !TARGET_REGISTRY_ENDPOINT! | !EXE_FILE! get
-        goto done
-    :wincred_update
-        call :info "Update Docker Registry Credential:"
-        call echo {"ServerURL":"!TARGET_REGISTRY_ENDPOINT!","Username":"!CRED_USERNAME!","Secret":"!CRED_PASSWORD!"} | !EXE_FILE! store
-        goto wincred_list
-    :wincred_delete
-        call :info "Delete Docker Registry Credential:"
-        call echo !TARGET_REGISTRY_ENDPOINT! | !EXE_FILE! erase
-        goto wincred_list
-
-:nkscred_tasks
-    if ""=="!CLUSTER_NAME!" (
-        call :error "Cluster name is required"
-        goto try
-    )
-    if ""=="!NKS_UUID!" (
-        call :error "Cluster UUID is required"
-        goto try
-    )
-    :wincred_update
-        call :info "Update NCR Credential:"
-        set "NCP_CONFIGURE=%UserProfile%\.ncloud\configure"
-        if exist !NCP_CONFIGURE! (
-            call del !NCP_CONFIGURE!
-            if errorlevel 1 (
-                call :error "Failed to delete '!NCP_CONFIGURE!'"
-                goto done
-            )
-        )
-        call echo ncloud_access_key_id     = !CRED_USERNAME!> !NCP_CONFIGURE!
-        call echo ncloud_secret_access_key = !CRED_PASSWORD!>> !NCP_CONFIGURE!
-        call echo ncloud_api_url           = https://ncloud.apigw.ntruss.com>> !NCP_CONFIGURE!
-        call !EXE_FILE! create-kubeconfig --output !KUBE_CONFIG_FILE! --region !NKS_REGION! --clusterName !CLUSTER_NAME! --clusterUuid !NKS_UUID!
-        goto done
 
 :ncrcred_tasks
     if ""=="!CRED_NAME!" (
         call :error "Credential name is required"
         goto try
     )
+    if "1"=="!COMMAND_L!" goto ncrcred_list
     if "1"=="!COMMAND_R!" goto ncrcred_show
     if "1"=="!COMMAND_W!" goto ncrcred_update
     if "1"=="!COMMAND_D!" goto ncrcred_delete
@@ -487,8 +507,111 @@ set "OPTION="
         call :info "Delete NCR Credential:"
         call kubectl --kubeconfig !KUBE_CONFIG_FILE! delete secret !CRED_NAME!
         goto ncrcred_list
+    goto fail
+
+:ncp_job
+
+:ncp_fields
+    if ""=="!FIELD_O!" (
+        set "ORIGIN_REGISTRY_ENDPOINT=%DEFAULT_ORIGIN_REGISTRY_ENDPOINT%"
+    ) else (
+        set "ORIGIN_REGISTRY_ENDPOINT=!FIELD_T!"
+    )
+    if ""=="!FIELD_T!" (
+        set "TARGET_REGISTRY_ENDPOINT=%DEFAULT_TARGET_REGISTRY_ENDPOINT%"
+    ) else (
+        set "TARGET_REGISTRY_ENDPOINT=!FIELD_T!"
+    )
+    if ""=="!FIELD_C!" (
+        set "CLUSTER_NAME=%DEFAULT_CLUSTER_NAME%"
+    ) else (
+        set "CLUSTER_NAME=!FIELD_C!"
+    )
+    if ""=="!FIELD_D!" (
+        set "WORK_DIR=%DEFAULT_ROOT_DIR%\!CLUSTER_NAME!"
+    ) else (
+        set "WORK_DIR=!FIELD_D!"
+    )
+    if ""=="!FIELD_F!" (
+        set "KUBE_CONFIG_FILE=!WORK_DIR!\%DEFAULT_KUBE_CONFIG_FILE%"
+    ) else (
+        set "KUBE_CONFIG_FILE=!FIELD_F!"
+    )
+    if ""=="!FIELD_K!" (
+        set "KUBE_KUSTOMIZATION_FILE=!WORK_DIR!\!APP_NAME!\%DEFAULT_KUBE_KUSTOMIZATION_FILE%"
+    ) else (
+        set "KUBE_KUSTOMIZATION_FILE=!FIELD_K!"
+    )
+    call :info "  Registry:"
+    call :info "    Origin:"
+    call :info "      Endpoint: !ORIGIN_REGISTRY_ENDPOINT!"
+    call :info "      Image: !ORIGIN_IMAGE!"
+    call :info "    Target:"
+    call :info "      Endpoint: !TARGET_REGISTRY_ENDPOINT!"
+    call :info "      Image: !TARGET_IMAGE!"
+    call :info "  Kubernetes:"
+    call :info "    Cluster:"
+    call :info "      Name: !CLUSTER_NAME!"
+    call :info "      File: !KUBE_CONFIG_FILE!"
+    call :info "    Kustomize:"
+    call :info "      File: !KUBE_KUSTOMIZATION_FILE!"
 
 :ncp_tasks
+    if ""=="!CLUSTER_NAME!" (
+        call :error "Cluster name is required"
+        goto fail
+    )
+    if "1"=="!COMMAND_M!" (
+        call :info "Pull Origin Image:"
+        call docker image pull !ORIGIN_IMAGE!
+        if errorlevel 1 (
+            call :error "Failed to pull '!ORIGIN_IMAGE!'"
+            goto done
+        )
+        call :info "Rename Origin Image:"
+        call docker image tag !ORIGIN_IMAGE! !TARGET_IMAGE!
+        if errorlevel 1 (
+            call :error "Failed to rename '!ORIGIN_IMAGE!' to '!TARGET_IMAGE!'"
+            goto done
+        )
+        call :info "Delete Origin Image:"
+        call docker image rm !ORIGIN_IMAGE!
+        if errorlevel 1 (
+            call :error "Failed to delete '!ORIGIN_IMAGE!'"
+            goto done
+        )
+        call :info "Push Target Image:"
+        call docker image push !TARGET_IMAGE!
+        if errorlevel 1 (
+            call :error "Failed to push '!TARGET_IMAGE!'"
+            goto done
+        )
+        call :info "Delete Target Image:"
+        call docker image rm !TARGET_IMAGE!
+        if errorlevel 1 (
+            call :error "Failed to delete '!TARGET_IMAGE!'"
+            goto done
+        )
+    )
+    if "1"=="!COMMAND_A!" (
+        cd /d "!WORK_DIR!" >nul 2>&1
+        if errorlevel 1 (
+            call :error "'!WORK_DIR!' does not exist"
+            goto done
+        )
+        call :info "Apply Docker Image:"
+        call kustomize edit set image !APP_NAME!=!TARGET_IMAGE!
+        if errorlevel 1 (
+            call :error "Failed to edit '!TARGET_IMAGE!'"
+            goto done
+        )
+        call kubectl kustomize ./ | kubectl --kubeconfig !KUBE_CONFIG_FILE! apply -f -
+        if errorlevel 1 (
+            call :error "Failed to apply '!TARGET_IMAGE!'"
+            goto done
+        )
+    )
+    goto done
 
 :done
     call :end_at
@@ -517,7 +640,6 @@ goto end
     echo                                      Tools: %SKY%gradle, npm%NOCOLOR%
     echo                    Compatible Commands:
     echo                      -BI
-    echo                      -BIR
     echo                      -BIP
     echo                -I  Build Docker Image (Compose Build)
     echo                    Required Fields:
@@ -528,7 +650,6 @@ goto end
     echo                      -f [file]       Docker Compose File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_DOCKER_COMPOSE_FILE%%NOCOLOR%)
     echo                    Compatible Commands:
     echo                      -BI
-    echo                      -BIR
     echo                      -BIP
     echo                -R  Run Docker Image (Compose Up)
     echo                    Required Fields:
@@ -538,7 +659,7 @@ goto end
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                      -f [file]       Docker Compose File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_DOCKER_COMPOSE_FILE%%NOCOLOR%)
     echo                    Compatible Commands:
-    echo                      -BIR
+    echo                      -BR
     echo                -P  Push Docker Image
     echo                    Required Fields:
     echo                      -n [name]       Application Name
@@ -622,7 +743,19 @@ goto end
     echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
     echo                    Compatible Commands:
     echo                      -MA
+    echo                -L  List Kubernetes Resources
     echo                -A  Apply Docker Image to NKS
+    echo                    Required Fields:
+    echo                      -n [name]       Application Name
+    echo                      -v [version]    Application Version
+    echo                      -c [name]       Cluster Name
+    echo                      -d [directory]  Working directory (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%)
+    echo                      -f [file]       Cluster kubeconfig File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%DEFAULT_KUBE_CONFIG_FILE%%NOCOLOR%)
+    echo                      -t [endpoint]   Target Registry Endpoint (DEFAULT: %SKY%%DEFAULT_TARGET_REGISTRY_ENDPOINT%%NOCOLOR%)
+    echo                      -k [file]       Kustomization File (DEFAULT: %SKY%%DEFAULT_ROOT_DIR%\%NOCOLOR%%YELLOW%[Cluster Name]%NOCOLOR%%SKY%\%NOCOLOR%%YELLOW%[Application Name]%NOCOLOR%%SKY%\%DEFAULT_KUBE_KUSTOMIZATION_FILE%%NOCOLOR%)
+    echo                    Compatible Commands:
+    echo                      -MA
+    echo                -D  Delete Deployment and Service
     echo                    Required Fields:
     echo                      -n [name]       Application Name
     echo                      -v [version]    Application Version
@@ -684,8 +817,7 @@ goto end
     exit /b
 
 :import_ini
-    set "SDOCKER_DIR=%~dp0"
-    set "SDOCKER_INI=!SDOCKER_DIR!\sdocker.ini"
+    set "SDOCKER_INI=%SDOCKER_DIR%\%SDOCKER_FILE%.ini"
     if not exist !SDOCKER_INI! (
         exit /b
     )
@@ -712,5 +844,7 @@ goto end
 
 :end
     endlocal
-    call cmd /k
+    if not "!OPTION!"=="!OPTION:cred=!" (
+        call cmd /k
+    )
     exit /b !EXIT_CODE!
