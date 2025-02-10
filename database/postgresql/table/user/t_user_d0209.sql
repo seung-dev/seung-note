@@ -3,8 +3,8 @@ CREATE TABLE restful.t_user_d0209
 (
   org_no       VARCHAR(16) NOT NULL,
   user_no      VARCHAR(16) NOT NULL,
-  created_at    TIMESTAMP   NOT NULL DEFAULT NOW(),
-  updated_at    TIMESTAMP   NOT NULL DEFAULT NOW(),
+  created_at    TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at    TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_by VARCHAR(16) NOT NULL,
   CONSTRAINT pk_t_user_d0209 PRIMARY KEY (org_no, user_no)
 );

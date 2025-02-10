@@ -28,7 +28,7 @@ SELECT
 
 RETURN CONCAT(
 	prefix
-	, TO_CHAR(NOW(), date_format)
+	, TO_CHAR(CURRENT_TIMESTAMP, date_format)
 	, RIGHT(CONCAT(REPEAT('0', padding), NEXTVAL(sequence_name)::VARCHAR), padding)
 	, suffix
 	);

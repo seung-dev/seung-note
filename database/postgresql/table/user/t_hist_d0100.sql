@@ -2,7 +2,7 @@
 --DROP TABLE IF EXISTS restful.t_hist_d0100 CASCADE;
 CREATE TABLE restful.t_hist_d0100
 (
-  updated_at     TIMESTAMP    NOT NULL DEFAULT NOW(),
+  updated_at     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   trace_id      VARCHAR(18)  NOT NULL,
   request_time  TIMESTAMP    NOT NULL,
   response_time TIMESTAMP    NOT NULL,

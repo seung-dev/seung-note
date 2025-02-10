@@ -2,8 +2,8 @@
 CREATE TABLE restful.t_user_d0100
 (
   user_no      VARCHAR(16) NOT NULL,
-  created_at    TIMESTAMP   NOT NULL DEFAULT NOW(),
-  updated_at    TIMESTAMP   NOT NULL DEFAULT NOW(),
+  created_at    TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at    TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
   user_state   VARCHAR(1)  NOT NULL DEFAULT 'H',
   date_signin  TIMESTAMP  ,
   date_close   TIMESTAMP  ,

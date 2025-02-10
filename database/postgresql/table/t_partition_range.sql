@@ -1,6 +1,6 @@
 --DROP TABLE IF EXISTS public.t_partition_range;
 CREATE TABLE public.t_partition_range (
-	updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 	, contents VARCHAR(4) DEFAULT ''
 	, CONSTRAINT pk_t_partition_range PRIMARY KEY (updated_at)
 ) PARTITION BY RANGE(updated_at);

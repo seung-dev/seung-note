@@ -2,8 +2,8 @@
 CREATE TABLE restful.t_user_d0200
 (
   org_no      VARCHAR(16) NOT NULL,
-  created_at   TIMESTAMP   NOT NULL DEFAULT NOW(),
-  updated_at   TIMESTAMP   NOT NULL DEFAULT NOW(),
+  created_at   TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at   TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
   org_domain  VARCHAR(16) NOT NULL,
   is_active   SMALLINT    NOT NULL DEFAULT 1,
   org_no_prev VARCHAR(16) NOT NULL,

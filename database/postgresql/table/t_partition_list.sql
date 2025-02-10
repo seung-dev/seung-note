@@ -2,8 +2,8 @@
 CREATE TABLE public.t_partition_list (
 	username VARCHAR(32) NOT NULL
 	, userstate VARCHAR(1) DEFAULT 'A'
-	, created_at TIMESTAMP NOT NULL DEFAULT NOW()
-	, updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+	, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+	, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 	, mobile_no VARCHAR(17) DEFAULT ''
 	, CONSTRAINT pk_t_partition_list PRIMARY KEY (username, userstate)
 ) PARTITION BY RANGE(username, userstate);
@@ -31,7 +31,7 @@ SELECT * FROM public.t_partition_list_active ORDER BY 1 DESC;
 SELECT * FROM public.t_partition_list_closed ORDER BY 1 DESC;
 
 
-UPDATE public.t_partition_list SET updated_at = NOW(), userstate = 'C' WHERE username = 'abc@email.com';
+UPDATE public.t_partition_list SET updated_at = CURRENT_TIMESTAMP, userstate = 'C' WHERE username = 'abc@email.com';
 
 
 SELECT * FROM public.t_partition_list ORDER BY 1 DESC;
