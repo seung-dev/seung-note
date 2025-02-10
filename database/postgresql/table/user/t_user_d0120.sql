@@ -2,11 +2,11 @@
 CREATE TABLE restful.t_user_d0120
 (
   username    VARCHAR(32) NOT NULL,
-  created_at   TIMESTAMP   NOT NULL DEFAULT NOW(),
-  updated_at   TIMESTAMP   NOT NULL DEFAULT NOW(),
+  created_at   TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at   TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
   user_no     VARCHAR(16) NOT NULL,
   password      VARCHAR(64) NOT NULL,
-  password_expr TIMESTAMP   NOT NULL DEFAULT NOW() + '3 months'::INTERVAL,
+  password_expr TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP + '3 months'::INTERVAL,
   signin_fail SMALLINT    NOT NULL DEFAULT 0,
   is_temp     SMALLINT    NOT NULL DEFAULT 1,
   CONSTRAINT pk_t_user_d0120 PRIMARY KEY (username)

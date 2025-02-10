@@ -108,7 +108,7 @@ set "OPTION="
             )
         )
         if "ncp"=="!OPTION!" (
-            for %%a in (M A) do (
+            for %%a in (M A D) do (
                 if "%%a"=="!COMMAND!" (
                     set "COMMAND_!COMMAND!=1"
                     set "COMMANDS=!COMMANDS:~1!"
@@ -169,6 +169,7 @@ set "OPTION="
         if ""=="!APP_VERSION!" goto required
         goto begin
     :cred_inputs
+        if not "1"=="!COMMAND_W!" goto begin
         echo Credential:
         @rem Username
         set /p CRED_USERNAME="- Userame []: "
@@ -652,7 +653,7 @@ set "OPTION="
             call :error "Failed to edit '!TARGET_IMAGE!'"
             goto done
         )
-        call kubectl kustomize ./ | kubectl --kubeconfig !KUBECONFIG_FILE! apply -f -
+        call kustomize build | kubectl --kubeconfig !KUBECONFIG_FILE! apply -f -
         if errorlevel 1 (
             call :error "Failed to apply '!TARGET_IMAGE!'"
             goto done
@@ -664,15 +665,15 @@ set "OPTION="
             call :error "'!KUSTOMIZE_DIR!' does not exist"
             goto done
         )
-        call :info "Apply Docker Image:"
+        call :info "Delete Kubernetes Resources:"
         call kustomize edit set image !APP_NAME!=!TARGET_IMAGE!
         if errorlevel 1 (
             call :error "Failed to edit '!TARGET_IMAGE!'"
             goto done
         )
-        call kubectl kustomize ./ | kubectl --kubeconfig !KUBECONFIG_FILE! delete -f -
+        call kustomize build | kubectl --kubeconfig !KUBECONFIG_FILE! delete -f -
         if errorlevel 1 (
-            call :error "Failed to apply '!TARGET_IMAGE!'"
+            call :error "Failed to delete '!TARGET_IMAGE!'"
             goto done
         )
         goto done
@@ -914,8 +915,8 @@ goto end
     goto end
 
 :end
+    endlocal
     if not ""=="!OPTION!" if not "!OPTION!"=="!OPTION:cred=!" (
         call cmd /k
     )
-    endlocal
     exit /b !EXIT_CODE!
